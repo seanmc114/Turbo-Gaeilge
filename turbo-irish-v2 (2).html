@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="ga">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Turbo Irish</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Turbo Irish">
+<link rel="apple-touch-icon" id="appIcon" href="">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:      #f2f7f2;
+  --deep:    #e4ede4;
+  --card:    #ffffff;
+  --border:  #b8d4b8;
+  --gold:    #c9a84c;
+  --gold2:   #0a1a0a;
+  --cream:   #0a1a0a;
+  --text:    #0a1a0a;
+  --muted:   #3a5a3a;
+  --green:   #2a7a4a;
+  --red:     #c94c4c;
+  --blue:    #4a80c9;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+
+/* HEADER */
+.hdr{width:100%;background:#e4ede4;border-bottom:1px solid #b8d4b8;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:900;letter-spacing:.1em;}
+.logo .t{color:#4a80c9;}
+.logo .sep{color:#c9a84c;margin:0 3px;font-size:.8rem;}
+.logo .i{color:#c94c4c;}
+.lives{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--muted);}
+.life{font-size:1rem;transition:all .3s;}
+.life.empty{opacity:.2;filter:grayscale(1);}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;align-items:center;height:calc(100dvh - 41px);overflow:hidden;padding:10px 13px 10px;}
+.screen.active{display:flex;}
+.screen.scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* HOME */
+.home-top{text-align:center;padding:12px 0 10px;flex-shrink:0;}
+.fada{font-family:'Cinzel',serif;font-size:3rem;color:#c9a84c;line-height:1;text-shadow:0 0 40px rgba(201,168,76,.2);}
+.home-title{font-family:'Cinzel',serif;font-size:1.35rem;color:#1a2a1a;letter-spacing:.12em;margin:3px 0 2px;}
+.home-sub{font-size:.65rem;color:#5a7a5a;letter-spacing:.18em;text-transform:uppercase;}
+
+.levels-wrap{width:100%;display:flex;flex-direction:column;gap:7px;margin-top:10px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;}
+.level-row{background:#f4fcf4;border:1px solid #90c090;border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s;width:100%;}
+.level-row:active{border-color:var(--gold);}
+.level-row.locked{opacity:.35;cursor:not-allowed;}
+.level-row.earned{border-color:#2a4a2a;}
+.lv-badge-col{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:#e8f4e8;border:1px solid var(--border);flex-shrink:0;}
+.lv-badge-col.earned-badge{background:linear-gradient(135deg,#fff8e8,#ffecc0);border-color:var(--gold);}
+.lv-info{flex:1;}
+.lv-name{font-size:.9rem;font-weight:600;color:var(--cream);}
+.lv-desc{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.lv-progress{font-size:.65rem;color:var(--gold);margin-top:2px;}
+.lv-lock{font-size:.9rem;color:var(--muted);}
+
+/* LEVEL INTRO */
+.intro-wrap{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:14px;}
+.intro-badge{font-size:4rem;line-height:1;}
+.intro-level{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.1em;}
+.intro-name{font-size:1rem;color:var(--cream);font-weight:500;}
+.intro-desc{font-size:.78rem;color:var(--muted);line-height:1.6;max-width:280px;}
+.intro-loops{font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+.btn-start{background:#2a5a3a;color:#ffffff;border:none;border-radius:10px;padding:13px 32px;font-size:1rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:.05em;transition:opacity .15s;}
+.btn-start:active{opacity:.8;}
+
+/* GAME */
+.g-top{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-shrink:0;}
+.g-info{font-family:'Cinzel',serif;font-size:.8rem;color:#8a6010;letter-spacing:.08em;font-weight:700;}
+.g-score{font-size:.78rem;color:#4a6a4a;}
+.g-score span{color:var(--cream);font-weight:600;}
+
+.timer-wrap{width:100%;height:3px;background:var(--border);border-radius:2px;margin-bottom:3px;overflow:hidden;flex-shrink:0;}
+.progress-wrap{width:100%;height:5px;background:var(--border);border-radius:3px;margin-bottom:6px;overflow:hidden;flex-shrink:0;}
+.progress-bar{height:100%;background:#c9a84c;border-radius:3px;transition:width .3s ease;}
+.timer-bar{height:100%;background:var(--gold);border-radius:2px;transition:width .1s linear,background .4s;}
+
+.q-card{width:100%;background:#ffffff;border:1px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:8px;text-align:center;flex-shrink:0;}
+.q-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.q-prog{font-size:.6rem;color:#4a6a4a;letter-spacing:.1em;text-transform:uppercase;}
+.q-type{font-size:.65rem;color:#8a6010;border:1px solid #c9a84c;border-radius:3px;padding:2px 7px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;}
+.q-text{font-size:1.12rem;font-weight:600;color:#0a1a0a;line-height:1.35;}
+.q-irish{font-size:1.15rem;font-weight:600;color:var(--cream);margin-top:3px;}
+
+/* MC */
+.mc-wrap{width:100%;display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.mc-btn{background:#334a35;border:1px solid #4a664c;border-radius:9px;padding:10px 13px;text-align:left;cursor:pointer;transition:border-color .12s;width:100%;font-size:.9rem;font-weight:500;color:#ffffff;display:flex;flex-direction:column;gap:2px;}
+.mc-btn:active:not(.revealed){border-color:var(--gold);background:#5a7e5a;}
+.mc-ph{font-size:.65rem;color:var(--muted);font-style:italic;display:none;}
+.mc-btn.correct{border-color:#5ada7a;background:rgba(42,200,80,.15);color:#5ada7a;}
+.mc-btn.correct .mc-ph{display:block;color:#5ada7a;}
+.mc-btn.wrong{border-color:#ff7070;background:rgba(255,80,80,.12);color:#ff7070;}
+.mc-btn.faded{opacity:.25;}
+
+/* BRIDGE */
+.bridge-irish{font-size:1.7rem;font-weight:800;color:#0a1a0a;text-align:center;margin-bottom:4px;line-height:1.3;}
+.bridge-ph{font-size:.72rem;color:#4a6a4a;font-style:italic;text-align:center;margin-bottom:8px;}
+
+/* TYPED */
+.typed-wrap{width:100%;flex-shrink:0;}
+.typed-input{width:100%;background:#ffffff;border:1px solid #a8c8a8;border-radius:9px;padding:11px 13px;font-size:1rem;color:var(--cream);font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;margin-bottom:6px;}
+.typed-input:focus{border-color:var(--gold);}
+.typed-input.ok{border-color:var(--green);}
+.typed-input.bad{border-color:var(--red);}
+.fada-note{font-size:.67rem;color:#3a5a3a;text-align:center;margin-bottom:6px;flex-shrink:0;}
+.fada-note strong{color:var(--gold);}
+.hint-row{display:flex;gap:6px;margin-bottom:6px;flex-shrink:0;}
+
+.btn-submit{width:100%;background:#2a5a3a;color:#ffffff;border:none;border-radius:9px;padding:11px;font-size:.92rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:6px;flex-shrink:0;transition:opacity .15s;}
+.btn-submit:active{opacity:.8;}
+
+/* FEEDBACK */
+.fb{width:100%;background:#ffffff;border-radius:9px;padding:9px 12px;display:none;flex-direction:column;gap:3px;flex-shrink:0;margin-bottom:6px;}
+.fb.show{display:flex;}
+.fb-result{font-size:.95rem;font-weight:700;}
+.fb-result.ok{color:var(--green);}
+.fb-result.bad{color:var(--red);}
+.fb-ans{font-size:.88rem;color:#0a1a0a;font-weight:500;}
+.fb-ph{font-size:.72rem;color:#4a6a4a;font-style:italic;}
+.fb-stars{font-size:1rem;letter-spacing:2px;}
+.fb-bonus{font-size:.6rem;color:var(--gold);font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+
+.btn-next{width:100%;background:transparent;border:1px solid #c9a84c;color:#8a6a1a;border-radius:9px;padding:10px;font-size:.88rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;transition:all .15s;display:none;}
+.btn-next:active{background:#2a5a3a;color:#ffffff;}
+
+/* LOOP COMPLETE */
+.loop-wrap{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:8px;padding:0 4px;}
+.loop-icon{font-size:3rem;}
+.loop-title{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold);margin-bottom:2px;}
+.loop-score{font-size:1.05rem;color:#0a1a0a;font-weight:700;}
+.loop-stars{font-size:1.6rem;letter-spacing:3px;color:var(--gold);}
+.loop-msg{font-size:.88rem;color:#4a6a4a;line-height:1.6;max-width:260px;}
+.loop-life{font-size:.95rem;color:#1a6a2a;font-weight:700;}
+.btn-row{display:flex;flex-direction:column;gap:7px;width:100%;margin-top:6px;}
+.btn-p{width:100%;background:#2a5a3a;color:#ffffff;border:none;border-radius:9px;padding:12px;font-size:.9rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:opacity .15s;}
+.btn-p:active{opacity:.8;}
+.btn-s{width:100%;background:transparent;border:1px solid var(--border);color:#4a6a4a;border-radius:9px;padding:10px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
+.btn-s:active{border-color:var(--muted);color:var(--text);}
+
+/* BADGE EARNED */
+.badge-celebration{font-size:.7rem;color:var(--green);letter-spacing:.15em;text-transform:uppercase;font-weight:700;animation:glow 1.2s ease-in-out infinite alternate;}
+@keyframes glow{from{opacity:.6;}to{opacity:1;text-shadow:0 0 12px var(--green);}}
+.badge-divider{width:60px;height:2px;background:var(--gold);border-radius:1px;margin:4px auto;}
+.badge-quote{font-size:.85rem;color:#c8c8b0;font-style:italic;line-height:1.6;max-width:260px;text-align:center;}
+.badge-quote-en{font-size:.75rem;color:var(--muted);margin-top:3px;font-style:italic;}
+.badge-wrap{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:10px;padding:8px 16px;}
+.badge-big{font-size:5.5rem;line-height:1;animation:pulse 1.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 20px rgba(201,168,76,0.4));}
+@keyframes pulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+.badge-earned-lbl{font-size:.65rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;}
+.badge-level{font-family:'Cinzel',serif;font-size:1.4rem;color:var(--gold);letter-spacing:.1em;}
+.badge-name{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--cream);letter-spacing:.06em;}
+.badge-irish{font-size:.85rem;color:var(--muted);font-style:italic;}
+.badge-next{font-size:.78rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo"><span class="t">TURBO</span><span class="sep">✦</span><span class="i">IRISH</span></div>
+  <div class="lives" id="livesDisplay"></div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="homeScreen">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:16px;padding:20px;">
+    <div id="homeIcon" style="font-size:4rem;line-height:1;margin-bottom:4px;">🌑</div>
+    <div class="home-title">TURBO IRISH</div>
+    <div class="home-sub">Caighdeán Oifigiúil</div>
+    <div id="badgeCollection" style="font-size:1.3rem;letter-spacing:6px;min-height:2rem;"></div>
+    <div style="font-size:.78rem;color:#2a4a2a;max-width:280px;line-height:1.7;font-style:italic;" id="homeMsg">Foghlaim Gaeilge · Learn Irish</div>
+    <div style="font-size:.68rem;color:#4a6a4a;max-width:280px;line-height:1.6;text-align:center;" id="homeEncouragement"></div>
+    <button class="btn-start" id="homeStartBtn" onclick="handleStart()">
+      <span style="display:block" id="startBtnText">Tosaigh an turas · Begin the journey</span>
+      <span style="display:block;font-size:.72rem;opacity:.7;font-weight:400">Foghlaim Gaeilge · Learn Irish</span>
+    </button>
+    <div id="homeLevelsLink" style="display:none;font-size:.72rem;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);padding-bottom:1px;" onclick="showLevels()">Leibhéil · Levels</div>
+  </div>
+</div>
+
+<!-- LEVELS -->
+<div class="screen scrollable" id="levelsScreen">
+  <div class="home-top" style="flex-shrink:0">
+    <div class="fada" style="font-size:1.5rem">á</div>
+    <div class="home-title" style="font-size:1rem">TURBO IRISH</div>
+  </div>
+  <div class="levels-wrap" id="levelsWrap"></div>
+  <button class="btn-s" style="margin-top:10px;flex-shrink:0" onclick="show('homeScreen')">← Ar ais · Back</button>
+</div>
+
+<!-- LEVEL INTRO -->
+<div class="screen" id="introScreen">
+  <div class="intro-wrap">
+    <div class="intro-badge" id="introBadge"></div>
+    <div>
+      <div class="intro-level" id="introLevel"></div>
+      <div class="intro-name" id="introName"></div>
+    </div>
+    <div class="intro-desc" id="introDesc"></div>
+    <div class="intro-loops" id="introLoops"></div>
+    <button class="btn-start" onclick="startFirstLoop()"><span style="display:block">Tosaigh →</span><span style="display:block;font-size:.72rem;opacity:.65;font-weight:500">Begin</span></button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="gameScreen">
+  <div class="g-top">
+    <div class="g-info" id="gInfo"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="g-score">★ <span id="gStars">0</span></div>
+      <span onclick="goHome()" style="font-size:.7rem;color:#2a7a2a;cursor:pointer;border-bottom:1px solid #3a5a3a;padding-bottom:1px;">← Baile</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+
+  <div class="q-card">
+    <div class="q-meta">
+      <div class="q-prog" id="qProg"></div>
+      <div class="q-type" id="qType"></div>
+    </div>
+    <div class="bridge-irish" id="bridgeIrish" style="display:none"></div>
+    <div class="bridge-ph" id="bridgePh" style="display:none"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="q-irish" id="qIrish" style="display:none"></div>
+  </div>
+
+  <div class="mc-wrap" id="mcWrap"></div>
+  <div id="mcHintBtn" onclick="useMCHint()" style="display:none;text-align:center;padding:8px 0 2px;cursor:pointer;"><span id="mcHintTxt" style="font-size:.72rem;color:#2a7a4a;border-bottom:1px solid #b8d4b8;padding-bottom:2px;">💡 Leid · Hint (<span id="mcHintLives">5</span>)</span></div>
+
+  <div class="typed-wrap" id="typedWrap" style="display:none">
+    <input class="typed-input" id="typedInput" type="text" placeholder="Scríobh anseo…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="fada-note">Fadas roghnach · optional — <strong>★★★</strong> má tá siad agat · if you nail them</div>
+    <button class="btn-submit" onclick="submitTyped()">Seol → <span style="font-size:.72rem;opacity:.65;font-weight:500">Send</span></button>
+    <div id="hintBtn" onclick="useHint()" style="text-align:center;padding:4px 0 2px;cursor:pointer;"><span id="hintTxt" style="font-size:.72rem;color:#2a7a4a;border-bottom:1px solid #b8d4b8;padding-bottom:2px;">💡 Leid · Hint (<span id="hintLivesCount">5</span>)</span></div>
+  </div>
+
+  <div class="fb" id="fb">
+    <div class="fb-result" id="fbResult"></div>
+    <div class="fb-ans" id="fbAns"></div>
+    <div class="fb-ph" id="fbPh"></div>
+    <div class="fb-stars" id="fbStars"></div>
+    <div class="fb-bonus" id="fbBonus"></div>
+  </div>
+  <button class="btn-next" id="btnNext" onclick="nextQ()"><span style="display:block">Ar aghaidh →</span><span style="display:block;font-size:.7rem;opacity:.6;font-weight:400">Continue</span></button>
+</div>
+
+<!-- LOOP COMPLETE -->
+<div class="screen" id="loopScreen">
+  <div class="loop-wrap">
+    <div class="loop-icon" id="loopIcon"></div>
+    <div class="loop-title" id="loopTitle"></div>
+    <div class="loop-stars" id="loopStars"></div>
+    <div class="loop-score" id="loopScore"></div>
+    <div class="loop-msg" id="loopMsg"></div>
+    <div class="loop-life" id="loopLife"></div>
+    <div class="btn-row" id="loopBtns"></div>
+  </div>
+</div>
+
+<!-- BADGE EARNED -->
+<div class="screen" id="badgeScreen">
+  <div class="badge-wrap">
+    <div class="badge-celebration">✦ Gnóthaithe · Earned ✦</div>
+    <div class="badge-big" id="badgeBig"></div>
+    <div class="badge-divider"></div>
+    <div>
+      <div class="badge-level" id="badgeLevel"></div>
+      <div class="badge-name" id="badgeName"></div>
+    </div>
+    <div class="badge-quote" id="badgeIrish"></div>
+    <div class="badge-quote-en" id="badgeIrishEn"></div>
+    <div class="badge-next" id="badgeNext"></div>
+    <div class="btn-row" style="max-width:300px;width:100%">
+      <button class="btn-p" id="badgeContinueBtn"></button>
+      <button class="btn-s" onclick="goHome()">← Abhaile · Home</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// CONTENT
+// ─────────────────────────────────────────────────────────────
+const LEVELS = [
+  {
+    id: 'A1',
+    name: 'Tosaitheoir',
+    desc: 'Buntús na Gaeilge — the very first words. Greetings, numbers, colours, yes and no.',
+    badge: '🌱',
+    badgeIrish: 'Mol an óige agus tiocfaidh sí.',
+    badgeIrishEn: 'Praise the young and they will flourish.',
+    loops: [
+      {
+        name: 'Beannachtaí',
+        desc: 'Greetings & goodbyes',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you say 'Hello'?", a:"Dia duit", ph:"Dee-ah gwitch", opts:["Dia duit","Slán leat","Go raibh maith agat","Oíche mhaith"] },
+          { type:'mc', q:"How do you say 'Goodbye'?", a:"Slán leat", ph:"Slawn lyat", opts:["Slán leat","Dia duit","Cén chaoi?","Maidin mhaith"] },
+          { type:'mc', q:"How do you say 'Good morning'?", a:"Maidin mhaith", ph:"Mah-jin wah", opts:["Maidin mhaith","Oíche mhaith","Slán leat","Dia duit"] },
+          { type:'mc', q:"How do you say 'Good night'?", a:"Oíche mhaith", ph:"Ee-ha wah", opts:["Oíche mhaith","Maidin mhaith","Tráthnóna maith","Slán go fóill"] },
+          { type:'mc', q:"How do you say 'Good evening'?", a:"Tráthnóna maith", ph:"Traw-noh-na mah", opts:["Tráthnóna maith","Maidin mhaith","Oíche mhaith","Slán leat"] },
+          { type:'mc', q:"How do you say 'See you later'?", a:"Slán go fóill", ph:"Slawn guh foil", opts:["Slán go fóill","Slán leat","Oíche mhaith","Ar aghaidh"] },
+          { type:'mc', q:"How do you say 'See you tomorrow'?", a:"Feicfidh mé amárach thú", ph:"Fek-ee may ah-maw-rukh hoo", opts:["Feicfidh mé amárach thú","Slán go fóill","Oíche mhaith","Ar aghaidh leat"] },
+          { type:'mc', q:"How do you say 'Good luck'?", a:"Go n-éirí leat", ph:"Guh nay-ree lyat", opts:["Go n-éirí leat","Go raibh maith agat","Slán leat","Is maith liom thú"] },
+          { type:'mc', q:"'Hello' to more than one person?", a:"Dia daoibh", ph:"Dee-ah yeev", opts:["Dia daoibh","Dia duit","Dia is Muire duit","Slán libh"] },
+          { type:'mc', q:"'Goodbye' to more than one person?", a:"Slán libh", ph:"Slawn liv", opts:["Slán libh","Slán leat","Slán go fóill","Oíche mhaith"] },
+          { type:'bridge', q:"What does this mean?", irish:"Dia duit", a:"Hello", ph:"Dee-ah gwitch", opts:["Hello","Goodbye","Good night","Thank you"] },
+          { type:'bridge', q:"What does this mean?", irish:"Maidin mhaith", a:"Good morning", ph:"Mah-jin wah", opts:["Good morning","Good night","Good evening","Hello"] },
+          { type:'bridge', q:"What does this mean?", irish:"Slán go fóill", a:"See you later", ph:"Slawn guh foil", opts:["See you later","Goodbye","Good luck","Good evening"] },
+          { type:'bridge', q:"What does this mean?", irish:"Oíche mhaith", a:"Good night", ph:"Ee-ha wah", opts:["Good night","Good morning","Good evening","Sleep well"] },
+          { type:'bridge', q:"What does this mean?", irish:"Go n-éirí leat", a:"Good luck", ph:"Guh nay-ree lyat", opts:["Good luck","Thank you","Goodbye","See you later"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tráthnóna maith", a:"Good evening", ph:"Traw-noh-na mah", opts:["Good evening","Good afternoon","Good night","Good morning"] },
+          { type:'mc', q:"The response to 'Dia duit' is?", a:"Dia is Muire duit", ph:"Dee-ah iss Mwir-ah gwitch", opts:["Dia is Muire duit","Dia duit","Slán leat","Go raibh maith agat"] },
+          { type:'bridge', q:"What does this mean?", irish:"Dia is Muire duit", a:"God and Mary be with you (reply to hello)", ph:"Dee-ah iss Mwir-ah gwitch", opts:["God and Mary be with you (reply to hello)","Hello","Goodbye","God bless you"] },
+          { type:'typed', q:"Type: 'Good morning'", a:"Maidin mhaith", ph:"Mah-jin wah", alt:["maidin mhaith","maidin vah"] },
+          { type:'typed', q:"Type: 'Goodbye'", a:"Slán leat", ph:"Slawn lyat", alt:["slan leat","slán leat"] },
+          { type:'typed', q:"Type: 'Good night'", a:"Oíche mhaith", ph:"Ee-ha wah", alt:["oiche mhaith","oíche mhaith"] },
+          { type:'typed', q:"Type: 'Hello'", a:"Dia duit", ph:"Dee-ah gwitch", alt:["dia duit"] },
+        ]
+      },
+      {
+        name: 'Go raibh maith agat',
+        desc: 'Please, thank you & sorry',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you say 'Thank you'?", a:"Go raibh maith agat", ph:"Guh rev mah agut", opts:["Go raibh maith agat","Más é do thoil é","Gabh mo leithscéal","Tá fáilte romhat"] },
+          { type:'mc', q:"How do you say 'Please'?", a:"Más é do thoil é", ph:"Maws ay duh hull ay", opts:["Más é do thoil é","Go raibh maith agat","Tá brón orm","Gabh mo leithscéal"] },
+          { type:'mc', q:"How do you say 'You're welcome'?", a:"Tá fáilte romhat", ph:"Taw fawl-cha row-ut", opts:["Tá fáilte romhat","Go raibh maith agat","Is deas bualadh leat","Slán leat"] },
+          { type:'mc', q:"How do you say 'Excuse me'?", a:"Gabh mo leithscéal", ph:"Gov muh lesh-kayl", opts:["Gabh mo leithscéal","Tá brón orm","Más é do thoil é","Is mise"] },
+          { type:'mc', q:"How do you say 'I am sorry'?", a:"Tá brón orm", ph:"Taw brawn urrum", opts:["Tá brón orm","Tá áthas orm","Gabh mo leithscéal","Tá náire orm"] },
+          { type:'mc', q:"'Thank you very much' — how do you say it?", a:"Go raibh míle maith agat", ph:"Guh rev mee-leh mah agut", opts:["Go raibh míle maith agat","Go raibh maith agat","Tá fáilte romhat","Is maith liom é"] },
+          { type:'mc', q:"How do you say 'Don't mention it / Not at all'?", a:"Ná habair é", ph:"Naw hab-ir ay", opts:["Ná habair é","Tá fáilte romhat","Níl aon fhadhb ann","Is cuma liom"] },
+          { type:'mc', q:"How do you say 'No problem'?", a:"Níl aon fhadhb ann", ph:"Neel ayn eye-b own", opts:["Níl aon fhadhb ann","Tá fáilte romhat","Is cuma liom","Ná bac leis"] },
+          { type:'bridge', q:"What does this mean?", irish:"Go raibh maith agat", a:"Thank you", ph:"Guh rev mah agut", opts:["Thank you","You're welcome","Please","Excuse me"] },
+          { type:'bridge', q:"What does this mean?", irish:"Más é do thoil é", a:"Please", ph:"Maws ay duh hull ay", opts:["Please","Thank you","Sorry","Excuse me"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá brón orm", a:"I am sorry", ph:"Taw brawn urrum", opts:["I am sorry","I am happy","I am embarrassed","Excuse me"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá fáilte romhat", a:"You are welcome", ph:"Taw fawl-cha row-ut", opts:["You are welcome","Thank you","Please","Welcome (to a place)"] },
+          { type:'bridge', q:"What does this mean?", irish:"Go raibh míle maith agat", a:"Thank you very much", ph:"Guh rev mee-leh mah agut", opts:["Thank you very much","Thank you","You're very welcome","A thousand thanks"] },
+          { type:'bridge', q:"What does this mean?", irish:"Gabh mo leithscéal", a:"Excuse me", ph:"Gov muh lesh-kayl", opts:["Excuse me","I am sorry","Pardon me","Forgive me"] },
+          { type:'mc', q:"'Sorry to bother you' — which fits best?", a:"Gabh mo leithscéal as cur isteach ort", ph:"Gov muh lesh-kayl ass kur ish-tyakh urt", opts:["Gabh mo leithscéal as cur isteach ort","Tá brón orm","Níl aon fhadhb ann","Is cuma liom"] },
+          { type:'mc', q:"How do you say 'It doesn't matter'?", a:"Is cuma", ph:"Iss kum-uh", opts:["Is cuma","Tá brón orm","Ná habair é","Níl aon fhadhb ann"] },
+          { type:'typed', q:"Type: 'Thank you'", a:"Go raibh maith agat", ph:"Guh rev mah agut", alt:["go raibh maith agat"] },
+          { type:'typed', q:"Type: 'I am sorry'", a:"Tá brón orm", ph:"Taw brawn urrum", alt:["ta bron orm","tá brón orm"] },
+          { type:'typed', q:"Type: 'You are welcome'", a:"Tá fáilte romhat", ph:"Taw fawl-cha row-ut", alt:["ta failte romhat","tá fáilte romhat"] },
+          { type:'typed', q:"Type: 'Excuse me'", a:"Gabh mo leithscéal", ph:"Gov muh lesh-kayl", alt:["gabh mo leithsceal","gabh mo leithscéal"] },
+        ]
+      },
+      {
+        name: 'Is mise...',
+        desc: 'Saying who you are',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you say 'My name is...'?", a:"Is mise...", ph:"Iss mish-ah", opts:["Is mise...","Tá mé...","Cad is ainm duit?","Is é mo ainm..."] },
+          { type:'mc', q:"How do you ask 'What is your name?'", a:"Cad is ainm duit?", ph:"Kod iss anim ditch", opts:["Cad is ainm duit?","Cé thú féin?","Cá bhfuil tú?","Cén chaoi?"] },
+          { type:'mc', q:"How do you say 'Nice to meet you'?", a:"Is deas bualadh leat", ph:"Iss dass boo-luh lyat", opts:["Is deas bualadh leat","Go raibh maith agat","Tá fáilte romhat","Slán leat"] },
+          { type:'mc', q:"How do you say 'How are you?'", a:"Cén chaoi a bhfuil tú?", ph:"Kayn khwee uh will too", opts:["Cén chaoi a bhfuil tú?","Cad is ainm duit?","Cá bhfuil tú?","Cé thú féin?"] },
+          { type:'mc', q:"How do you say 'I am well'?", a:"Tá mé go maith", ph:"Taw may guh mah", opts:["Tá mé go maith","Tá mé go dona","Tá mé tuirseach","Níl mé go maith"] },
+          { type:'mc', q:"How do you say 'not too bad'?", a:"Tá mé ceart go leor", ph:"Taw may kyart guh lore", opts:["Tá mé ceart go leor","Tá mé go maith","Tá mé go dona","Tá mé tinn"] },
+          { type:'mc', q:"How do you say 'I am not well'?", a:"Níl mé go maith", ph:"Neel may guh mah", opts:["Níl mé go maith","Tá mé go maith","Tá mé tinn","Tá mé go dona"] },
+          { type:'mc', q:"How do you say 'I am from Ireland'?", a:"Is as Éire mé", ph:"Iss ass Ayr-eh may", opts:["Is as Éire mé","Tá mé as Éire","Is Éireannach mé","Is mé as Éire"] },
+          { type:'mc', q:"How do you say 'I am Irish'?", a:"Is Éireannach mé", ph:"Iss ayr-un-ukh may", opts:["Is Éireannach mé","Tá mé Éireannach","Is as Éire mé","Tá mé as Éire"] },
+          { type:'mc', q:"How do you say 'Where are you from?'", a:"Cad as duit?", ph:"Kod ass ditch", opts:["Cad as duit?","Cá bhfuil tú?","Cé thú féin?","Cad is ainm duit?"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cad is ainm duit?", a:"What is your name?", ph:"Kod iss anim ditch", opts:["What is your name?","Where are you from?","How are you?","Who are you?"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is deas bualadh leat", a:"Nice to meet you", ph:"Iss dass boo-luh lyat", opts:["Nice to meet you","You're welcome","Good luck","See you later"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé go maith", a:"I am well", ph:"Taw may guh mah", opts:["I am well","I am tired","I am sick","I am not well"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cén chaoi a bhfuil tú?", a:"How are you?", ph:"Kayn khwee uh will too", opts:["How are you?","What is your name?","Where are you from?","Who are you?"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is as Éire mé", a:"I am from Ireland", ph:"Iss ass Ayr-eh may", opts:["I am from Ireland","I am Irish","I live in Ireland","I love Ireland"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé ceart go leor", a:"I am not too bad / fine", ph:"Taw may kyart guh lore", opts:["I am not too bad / fine","I am well","I am okay","I am great"] },
+          { type:'mc', q:"'I am delighted to meet you' — which is correct?", a:"Tá áthas orm bualadh leat", ph:"Taw aw-hus urrum boo-luh lyat", opts:["Tá áthas orm bualadh leat","Is deas bualadh leat","Tá fáilte romhat","Go raibh maith agat"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cad as duit?", a:"Where are you from?", ph:"Kod ass ditch", opts:["Where are you from?","Who are you?","What is your name?","Where are you going?"] },
+          { type:'typed', q:"Type: 'I am well'", a:"Tá mé go maith", ph:"Taw may guh mah", alt:["ta me go maith","tá mé go maith"] },
+          { type:'typed', q:"Type: 'My name is...'", a:"Is mise...", ph:"Iss mish-ah", alt:["is mise"] },
+          { type:'typed', q:"Type: 'Nice to meet you'", a:"Is deas bualadh leat", ph:"Iss dass boo-luh lyat", alt:["is deas bualadh leat"] },
+        ]
+      },
+      {
+        name: 'Uimhreacha',
+        desc: 'Numbers 1–20',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'one'?", a:"a haon", ph:"uh hayn", opts:["a haon","a dó","a trí","a ceathair"] },
+          { type:'mc', q:"How do you say 'two'?", a:"a dó", ph:"uh doh", opts:["a dó","a haon","a trí","a cúig"] },
+          { type:'mc', q:"How do you say 'three'?", a:"a trí", ph:"uh tree", opts:["a trí","a dó","a ceathair","a sé"] },
+          { type:'mc', q:"How do you say 'four'?", a:"a ceathair", ph:"uh kah-hir", opts:["a ceathair","a trí","a cúig","a sé"] },
+          { type:'mc', q:"How do you say 'five'?", a:"a cúig", ph:"uh koo-ig", opts:["a cúig","a ceathair","a sé","a seacht"] },
+          { type:'mc', q:"How do you say 'six'?", a:"a sé", ph:"uh shay", opts:["a sé","a cúig","a seacht","a hocht"] },
+          { type:'mc', q:"How do you say 'seven'?", a:"a seacht", ph:"uh shakht", opts:["a seacht","a sé","a hocht","a naoi"] },
+          { type:'mc', q:"How do you say 'eight'?", a:"a hocht", ph:"uh ukht", opts:["a hocht","a seacht","a naoi","a deich"] },
+          { type:'mc', q:"How do you say 'nine'?", a:"a naoi", ph:"uh nee", opts:["a naoi","a hocht","a deich","a seacht"] },
+          { type:'mc', q:"How do you say 'ten'?", a:"a deich", ph:"uh djeh", opts:["a deich","a naoi","a hocht","a seacht"] },
+          { type:'mc', q:"How do you say 'eleven'?", a:"a haon déag", ph:"uh hayn djayg", opts:["a haon déag","a dó dhéag","a trí déag","a deich"] },
+          { type:'mc', q:"How do you say 'twelve'?", a:"a dó dhéag", ph:"uh doh yayg", opts:["a dó dhéag","a haon déag","a trí déag","a ceathair déag"] },
+          { type:'mc', q:"How do you say 'fifteen'?", a:"a cúig déag", ph:"uh koo-ig djayg", opts:["a cúig déag","a sé déag","a ceathair déag","a seacht déag"] },
+          { type:'mc', q:"How do you say 'twenty'?", a:"fiche", ph:"fih-heh", opts:["fiche","deich","tríocha","daichead"] },
+          { type:'bridge', q:"What number is this?", irish:"a seacht", a:"seven", ph:"uh shakht", opts:["seven","six","eight","nine"] },
+          { type:'bridge', q:"What number is this?", irish:"a deich", a:"ten", ph:"uh djeh", opts:["ten","nine","eight","six"] },
+          { type:'bridge', q:"What number is this?", irish:"a naoi déag", a:"nineteen", ph:"uh nee djayg", opts:["nineteen","seventeen","sixteen","eighteen"] },
+          { type:'bridge', q:"What number is this?", irish:"fiche", a:"twenty", ph:"uh fih-heh", opts:["twenty","fifteen","eighteen","twelve"] },
+          { type:'bridge', q:"What number is this?", irish:"a hocht", a:"eight", ph:"uh ukht", opts:["eight","nine","seven","six"] },
+          { type:'bridge', q:"What number is this?", irish:"a ceathair", a:"four", ph:"uh kah-hir", opts:["four","three","five","six"] },
+          { type:'typed', q:"Type the Irish for 'five'", a:"a cúig", ph:"uh koo-ig", alt:["a cuig","a cúig"] },
+          { type:'typed', q:"Type the Irish for 'ten'", a:"a deich", ph:"uh djeh", alt:["a deich"] },
+          { type:'typed', q:"Type the Irish for 'twenty'", a:"fiche", ph:"fih-heh", alt:["fiche"] },
+        ]
+      },
+      {
+        name: 'Sea agus Níl',
+        desc: 'Yes, no and the verb Tá',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"'Yes' (it is) in Irish?", a:"Is ea", ph:"Shah", opts:["Is ea","Tá","Ní hea","Níl"] },
+          { type:'mc', q:"'No' (it is not) in Irish?", a:"Ní hea", ph:"Nee ha", opts:["Ní hea","Is ea","Níl","Tá"] },
+          { type:'mc', q:"'Yes' (I am / it is happening) in Irish?", a:"Tá", ph:"Taw", opts:["Tá","Is ea","Níl","Ní hea"] },
+          { type:'mc', q:"'No' (I am not) in Irish?", a:"Níl", ph:"Neel", opts:["Níl","Tá","Ní hea","Is ea"] },
+          { type:'mc', q:"'I am tired' — which is correct?", a:"Tá mé tuirseach", ph:"Taw may tirsh-ukh", opts:["Tá mé tuirseach","Tá mé sásta","Níl mé tuirseach","Is tuirseach mé"] },
+          { type:'mc', q:"'I am happy' — which is correct?", a:"Tá mé sásta", ph:"Taw may saw-sta", opts:["Tá mé sásta","Tá mé tuirseach","Tá mé brónach","Níl mé sásta"] },
+          { type:'mc', q:"'I am sad' — which is correct?", a:"Tá mé brónach", ph:"Taw may broh-nukh", opts:["Tá mé brónach","Tá mé sásta","Tá mé tuirseach","Tá brón orm"] },
+          { type:'mc', q:"'I am sick' — which is correct?", a:"Tá mé tinn", ph:"Taw may chin", opts:["Tá mé tinn","Tá mé tuirseach","Tá mé sásta","Níl mé go maith"] },
+          { type:'mc', q:"'I am busy' — which is correct?", a:"Tá mé gnóthach", ph:"Taw may gnoh-ukh", opts:["Tá mé gnóthach","Tá mé saor","Tá mé tuirseach","Tá mé sásta"] },
+          { type:'mc', q:"'I am free / available' — which is correct?", a:"Tá mé saor", ph:"Taw may seer", opts:["Tá mé saor","Tá mé gnóthach","Tá mé tinn","Níl mé saor"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé go maith", a:"I am well", ph:"Taw may guh mah", opts:["I am well","I am tired","I am hungry","I am sorry"] },
+          { type:'bridge', q:"What does this mean?", irish:"Níl mé go maith", a:"I am not well", ph:"Neel may guh mah", opts:["I am not well","I am well","I am tired","I am not tired"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé tuirseach", a:"I am tired", ph:"Taw may tirsh-ukh", opts:["I am tired","I am sick","I am happy","I am busy"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé tinn", a:"I am sick", ph:"Taw may chin", opts:["I am sick","I am tired","I am sad","I am not well"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé sásta", a:"I am happy / satisfied", ph:"Taw may saw-sta", opts:["I am happy / satisfied","I am well","I am tired","I am free"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé gnóthach", a:"I am busy", ph:"Taw may gnoh-ukh", opts:["I am busy","I am free","I am tired","I am well"] },
+          { type:'mc', q:"'I am cold' — which is correct?", a:"Tá fuacht orm", ph:"Taw foo-ukht urrum", opts:["Tá fuacht orm","Tá mé fuar","Tá mé fuacht","Níl fuacht orm"] },
+          { type:'mc', q:"'I am warm/hot' — which is correct?", a:"Tá teas orm", ph:"Taw chas urrum", opts:["Tá teas orm","Tá mé te","Tá mé teas","Níl teas orm"] },
+          { type:'typed', q:"Type: 'I am tired'", a:"Tá mé tuirseach", ph:"Taw may tirsh-ukh", alt:["ta me tuirseach","tá mé tuirseach"] },
+          { type:'typed', q:"Type: 'I am happy'", a:"Tá mé sásta", ph:"Taw may saw-sta", alt:["ta me sasta","tá mé sásta"] },
+          { type:'typed', q:"Type: 'I am sick'", a:"Tá mé tinn", ph:"Taw may chin", alt:["ta me tinn","tá mé tinn"] },
+        ]
+      },
+      {
+        name: 'Dathanna',
+        desc: 'Colours',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'red'?", a:"dearg", ph:"djah-rug", opts:["dearg","gorm","glas","bán"] },
+          { type:'mc', q:"How do you say 'blue'?", a:"gorm", ph:"gurrum", opts:["gorm","dearg","buí","dubh"] },
+          { type:'mc', q:"How do you say 'green'?", a:"glas", ph:"gloss", opts:["glas","gorm","dearg","bán"] },
+          { type:'mc', q:"How do you say 'white'?", a:"bán", ph:"bawn", opts:["bán","dubh","glas","buí"] },
+          { type:'mc', q:"How do you say 'black'?", a:"dubh", ph:"duv", opts:["dubh","bán","glas","dearg"] },
+          { type:'mc', q:"How do you say 'yellow'?", a:"buí", ph:"bwee", opts:["buí","bán","glas","dearg"] },
+          { type:'mc', q:"How do you say 'orange'?", a:"oráiste", ph:"oh-rawsh-teh", opts:["oráiste","dearg","buí","corcra"] },
+          { type:'mc', q:"How do you say 'purple'?", a:"corcra", ph:"kork-ruh", opts:["corcra","oráiste","gorm","dearg"] },
+          { type:'mc', q:"How do you say 'brown'?", a:"donn", ph:"dun", opts:["donn","liath","bán","dubh"] },
+          { type:'mc', q:"How do you say 'grey'?", a:"liath", ph:"lee-uh", opts:["liath","donn","bán","dubh"] },
+          { type:'mc', q:"How do you say 'pink'?", a:"bándearg", ph:"bawn-djah-rug", opts:["bándearg","corcra","oráiste","dearg"] },
+          { type:'mc', q:"'The red car' — which is correct?", a:"an carr dearg", ph:"un kor djah-rug", opts:["an carr dearg","an dearg carr","carr dearg an","an gorm carr"] },
+          { type:'bridge', q:"What colour is this?", irish:"dubh", a:"black", ph:"duv", opts:["black","white","red","blue"] },
+          { type:'bridge', q:"What colour is this?", irish:"buí", a:"yellow", ph:"bwee", opts:["yellow","white","green","red"] },
+          { type:'bridge', q:"What colour is this?", irish:"gorm", a:"blue", ph:"gurrum", opts:["blue","green","grey","purple"] },
+          { type:'bridge', q:"What colour is this?", irish:"dearg", a:"red", ph:"djah-rug", opts:["red","orange","pink","brown"] },
+          { type:'bridge', q:"What colour is this?", irish:"liath", a:"grey", ph:"lee-uh", opts:["grey","brown","white","black"] },
+          { type:'bridge', q:"What colour is this?", irish:"donn", a:"brown", ph:"dun", opts:["brown","grey","black","orange"] },
+          { type:'typed', q:"Type the Irish for 'green'", a:"glas", ph:"gloss", alt:["glas"] },
+          { type:'typed', q:"Type the Irish for 'black'", a:"dubh", ph:"duv", alt:["dubh"] },
+          { type:'typed', q:"Type the Irish for 'white'", a:"bán", ph:"bawn", alt:["ban","bán"] },
+        ]
+      },
+      {
+        name: 'An Teaghlach',
+        desc: 'Family — the people around you',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you say 'mother'?", a:"máthair", ph:"maw-hir", opts:["máthair","athair","deirfiúr","deartháir"] },
+          { type:'mc', q:"How do you say 'father'?", a:"athair", ph:"ah-hir", opts:["athair","máthair","uncail","aintín"] },
+          { type:'mc', q:"How do you say 'brother'?", a:"deartháir", ph:"djor-haw-ir", opts:["deartháir","deirfiúr","col ceathrair","mac"] },
+          { type:'mc', q:"How do you say 'sister'?", a:"deirfiúr", ph:"djeh-fyoor", opts:["deirfiúr","deartháir","iníon","bean"] },
+          { type:'mc', q:"How do you say 'son'?", a:"mac", ph:"mock", opts:["mac","iníon","deartháir","athair"] },
+          { type:'mc', q:"How do you say 'daughter'?", a:"iníon", ph:"in-een", opts:["iníon","mac","deirfiúr","máthair"] },
+          { type:'mc', q:"How do you say 'grandfather'?", a:"seanathair", ph:"shan-ah-hir", opts:["seanathair","seanmháthair","uncail","athair"] },
+          { type:'mc', q:"How do you say 'grandmother'?", a:"seanmháthair", ph:"shan-waw-hir", opts:["seanmháthair","seanathair","aintín","máthair"] },
+          { type:'mc', q:"How do you say 'uncle'?", a:"uncail", ph:"un-kil", opts:["uncail","aintín","col ceathrair","deartháir"] },
+          { type:'mc', q:"How do you say 'aunt'?", a:"aintín", ph:"an-cheen", opts:["aintín","uncail","col ceathrair","deirfiúr"] },
+          { type:'mc', q:"How do you say 'my wife'?", a:"mo bhean chéile", ph:"muh van khay-leh", opts:["mo bhean chéile","mo dhuine","mo chailín","mo mháthair"] },
+          { type:'mc', q:"How do you say 'my husband'?", a:"mo fhear céile", ph:"muh ar khay-leh", opts:["mo fhear céile","mo bhean chéile","mo dhuine","m'athair"] },
+          { type:'bridge', q:"What does this mean?", irish:"mo mháthair", a:"my mother", ph:"muh waw-hir", opts:["my mother","my father","my sister","my wife"] },
+          { type:'bridge', q:"What does this mean?", irish:"mo dheartháir", a:"my brother", ph:"muh djor-haw-ir", opts:["my brother","my father","my son","my uncle"] },
+          { type:'bridge', q:"What does this mean?", irish:"m'athair", a:"my father", ph:"mah-hir", opts:["my father","my mother","my grandfather","my uncle"] },
+          { type:'bridge', q:"What does this mean?", irish:"mo dheirfiúr", a:"my sister", ph:"muh djeh-fyoor", opts:["my sister","my mother","my daughter","my aunt"] },
+          { type:'bridge', q:"What does this mean?", irish:"m'iníon", a:"my daughter", ph:"min-een", opts:["my daughter","my sister","my mother","my niece"] },
+          { type:'bridge', q:"What does this mean?", irish:"mo mhac", a:"my son", ph:"muh mock", opts:["my son","my brother","my father","my nephew"] },
+          { type:'typed', q:"Type: 'my mother'", a:"mo mháthair", ph:"muh waw-hir", alt:["mo mhathair","mo máthair","mo mathair"] },
+          { type:'typed', q:"Type: 'my brother'", a:"mo dheartháir", ph:"muh djor-haw-ir", alt:["mo dhearthair","mo dearthair"] },
+          { type:'typed', q:"Type: 'my sister'", a:"mo dheirfiúr", ph:"muh djeh-fyoor", alt:["mo dheirfiur","mo deirfiur"] },
+        ]
+      },
+      {
+        name: 'Cá bhfuil?',
+        desc: 'Where is...? — places around you',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you ask 'Where is it?'", a:"Cá bhfuil sé?", ph:"Kaw will shay", opts:["Cá bhfuil sé?","Cad é sin?","Cé hé sin?","Cén chaoi?"] },
+          { type:'mc', q:"How do you say 'here'?", a:"anseo", ph:"un-shaw", opts:["anseo","ansin","thall","istigh"] },
+          { type:'mc', q:"How do you say 'there'?", a:"ansin", ph:"un-shin", opts:["ansin","anseo","amuigh","thall"] },
+          { type:'mc', q:"How do you say 'the toilet'?", a:"an leithreas", ph:"un leh-russ", opts:["an leithreas","an doras","an fhuinneog","an staighre"] },
+          { type:'mc', q:"How do you say 'straight ahead'?", a:"díreach ar aghaidh", ph:"djee-rukh er eye", opts:["díreach ar aghaidh","ar chlé","ar dheis","timpeall"] },
+          { type:'mc', q:"How do you say 'on the left'?", a:"ar chlé", ph:"er khlay", opts:["ar chlé","ar dheis","díreach ar aghaidh","ar ais"] },
+          { type:'mc', q:"How do you say 'on the right'?", a:"ar dheis", ph:"er yesh", opts:["ar dheis","ar chlé","díreach ar aghaidh","timpeall"] },
+          { type:'mc', q:"How do you say 'near'?", a:"in aice le", ph:"in ak-eh leh", opts:["in aice le","i bhfad ó","os comhair","taobh thiar de"] },
+          { type:'mc', q:"How do you say 'far from'?", a:"i bhfad ó", ph:"ih wod oh", opts:["i bhfad ó","in aice le","trasna ó","os comhair"] },
+          { type:'mc', q:"How do you say 'opposite / in front of'?", a:"os comhair", ph:"uss koh-ir", opts:["os comhair","taobh thiar de","in aice le","i bhfad ó"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé anseo", a:"It is here", ph:"Taw shay un-shaw", opts:["It is here","It is there","Where is it?","It is outside"] },
+          { type:'bridge', q:"What does this mean?", irish:"ar dheis", a:"on the right", ph:"er yesh", opts:["on the right","on the left","straight ahead","behind"] },
+          { type:'bridge', q:"What does this mean?", irish:"ar chlé", a:"on the left", ph:"er khlay", opts:["on the left","on the right","straight ahead","at the end"] },
+          { type:'bridge', q:"What does this mean?", irish:"díreach ar aghaidh", a:"straight ahead", ph:"djee-rukh er eye", opts:["straight ahead","on the right","on the left","turn around"] },
+          { type:'bridge', q:"What does this mean?", irish:"in aice le", a:"near / beside", ph:"in ak-eh leh", opts:["near / beside","far from","opposite","behind"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cá bhfuil an leithreas?", a:"Where is the toilet?", ph:"Kaw will un leh-russ", opts:["Where is the toilet?","Where is the door?","Where am I?","Is there a toilet?"] },
+          { type:'mc', q:"'Where is the shop?' — which is correct?", a:"Cá bhfuil an siopa?", ph:"Kaw will un shup-uh", opts:["Cá bhfuil an siopa?","Cá bhfuil an scoil?","Cá bhfuil an teach?","Cá bhfuil an bus?"] },
+          { type:'typed', q:"Type: 'Where is it?'", a:"Cá bhfuil sé?", ph:"Kaw will shay", alt:["ca bhfuil se","cá bhfuil sé"] },
+          { type:'typed', q:"Type: 'on the left'", a:"ar chlé", ph:"er khlay", alt:["ar chle","ar chlé"] },
+          { type:'typed', q:"Type: 'straight ahead'", a:"díreach ar aghaidh", ph:"djee-rukh er eye", alt:["direach ar aghaidh","díreach ar aghaidh"] },
+        ]
+      },
+      {
+        name: 'An Aimsir',
+        desc: 'The weather — the Irish obsession',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"'It is raining' — which is correct?", a:"Tá sé ag cur báistí", ph:"Taw shay eg kur bawsh-tee", opts:["Tá sé ag cur báistí","Tá sé fuar","Tá sé te","Tá sé ag cur sneachta"] },
+          { type:'mc', q:"'It is cold' — which is correct?", a:"Tá sé fuar", ph:"Taw shay foo-ur", opts:["Tá sé fuar","Tá sé te","Tá sé breá","Tá sé gaofar"] },
+          { type:'mc', q:"'It is warm' — which is correct?", a:"Tá sé te", ph:"Taw shay cheh", opts:["Tá sé te","Tá sé fuar","Tá sé fliuch","Tá sé gaofar"] },
+          { type:'mc', q:"'It is windy' — which is correct?", a:"Tá sé gaofar", ph:"Taw shay gwee-fur", opts:["Tá sé gaofar","Tá sé fuar","Tá sé te","Tá sé ag cur báistí"] },
+          { type:'mc', q:"'It is wet' — which is correct?", a:"Tá sé fliuch", ph:"Taw shay flyukh", opts:["Tá sé fliuch","Tá sé tirim","Tá sé te","Tá sé ag cur báistí"] },
+          { type:'mc', q:"'It is dry' — which is correct?", a:"Tá sé tirim", ph:"Taw shay chir-im", opts:["Tá sé tirim","Tá sé fliuch","Tá sé te","Tá sé fuar"] },
+          { type:'mc', q:"'It is snowing' — which is correct?", a:"Tá sé ag cur sneachta", ph:"Taw shay eg kur shnakht-uh", opts:["Tá sé ag cur sneachta","Tá sé ag cur báistí","Tá sé fuar","Tá sé ag cur fearthainne"] },
+          { type:'mc', q:"How do you say 'a lovely day'?", a:"Lá breá", ph:"Law braw", opts:["Lá breá","Lá fuar","Lá fliuch","Lá maith"] },
+          { type:'mc', q:"How do you say 'terrible weather'?", a:"Aimsir uafásach", ph:"Am-sheer oo-uh-faw-sukh", opts:["Aimsir uafásach","Aimsir bhreá","Aimsir fhuar","Aimsir the"] },
+          { type:'mc', q:"How do you say 'What is the weather like?'", a:"Cén aimsir atá ann?", ph:"Kayn am-sheer ah-taw own", opts:["Cén aimsir atá ann?","Cad é an aimsir?","Cén chaoi an aimsir?","An bhfuil sé fuar?"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé ag cur báistí", a:"It is raining", ph:"Taw shay eg kur bawsh-tee", opts:["It is raining","It is snowing","It is windy","It is cold"] },
+          { type:'bridge', q:"What does this mean?", irish:"Lá breá", a:"A lovely day", ph:"Law braw", opts:["A lovely day","A cold day","A wet day","A good day"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé gaofar", a:"It is windy", ph:"Taw shay gwee-fur", opts:["It is windy","It is cold","It is stormy","It is breezy"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé ag cur sneachta", a:"It is snowing", ph:"Taw shay eg kur shnakht-uh", opts:["It is snowing","It is raining","It is hailing","It is sleeting"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé tirim", a:"It is dry", ph:"Taw shay chir-im", opts:["It is dry","It is wet","It is warm","It is clear"] },
+          { type:'bridge', q:"What does this mean?", irish:"Aimsir uafásach", a:"Terrible weather", ph:"Am-sheer oo-uh-faw-sukh", opts:["Terrible weather","Beautiful weather","Cold weather","Rainy weather"] },
+          { type:'mc', q:"'Thank God it's not raining' — which is closest?", a:"Buíochas le Dia nach bhfuil sé ag cur báistí", ph:"Bwee-ukhas leh Djee-uh nokh will shay eg kur", opts:["Buíochas le Dia nach bhfuil sé ag cur báistí","Tá an aimsir go maith","Níl sé ag cur báistí","Tá sé tirim inniu"] },
+          { type:'typed', q:"Type: 'It is cold'", a:"Tá sé fuar", ph:"Taw shay foo-ur", alt:["ta se fuar","tá sé fuar"] },
+          { type:'typed', q:"Type: 'It is raining'", a:"Tá sé ag cur báistí", ph:"Taw shay eg kur bawsh-tee", alt:["ta se ag cur baisti","tá sé ag cur báistí"] },
+          { type:'typed', q:"Type: 'A lovely day'", a:"Lá breá", ph:"Law braw", alt:["la brea","lá breá"] },
+        ]
+      },
+      {
+        name: 'An Clog',
+        desc: 'Telling the time',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you ask 'What time is it?'", a:"Cén t-am é?", ph:"Kayn tom ay", opts:["Cén t-am é?","Cad é sin?","Cá bhfuil sé?","Cén lá é?"] },
+          { type:'mc', q:"'It is two o'clock' — which is correct?", a:"Tá sé a dó a chlog", ph:"Taw shay uh doh uh khlug", opts:["Tá sé a dó a chlog","Tá sé a haon a chlog","Tá sé a trí a chlog","Tá sé a ceathair a chlog"] },
+          { type:'mc', q:"How do you say 'in the morning'?", a:"ar maidin", ph:"er mah-jin", opts:["ar maidin","um thráthnóna","san oíche","i lár an lae"] },
+          { type:'mc', q:"How do you say 'in the evening'?", a:"um thráthnóna", ph:"um raw-noh-na", opts:["um thráthnóna","ar maidin","san oíche","i lár an lae"] },
+          { type:'mc', q:"How do you say 'at night'?", a:"san oíche", ph:"sun ee-ha", opts:["san oíche","ar maidin","um thráthnóna","i lár an lae"] },
+          { type:'mc', q:"'Half past two' — which is correct?", a:"leathuair tar éis a dó", ph:"lya-hoor tar aysh uh doh", opts:["leathuair tar éis a dó","leathuair chun a dó","fiche nóiméad tar éis a dó","ceathrú tar éis a dó"] },
+          { type:'mc', q:"'Quarter past three' — which is correct?", a:"ceathrú tar éis a trí", ph:"kya-roo tar aysh uh tree", opts:["ceathrú tar éis a trí","ceathrú chun a trí","leathuair tar éis a trí","fiche tar éis a trí"] },
+          { type:'mc', q:"How do you say 'What day is it today?'", a:"Cén lá é inniu?", ph:"Kayn law ay in-yoo", opts:["Cén lá é inniu?","Cén t-am é?","Cén dáta é?","Cad é an lá?"] },
+          { type:'mc', q:"'It is midday' — which is correct?", a:"Tá sé meán lae", ph:"Taw shay myan lay", opts:["Tá sé meán lae", "Tá sé a dó dhéag","Tá sé meán oíche","Tá sé leathuair tar éis a dó dhéag"] },
+          { type:'mc', q:"'It is midnight' — which is correct?", a:"Tá sé meán oíche", ph:"Taw shay myan ee-ha", opts:["Tá sé meán oíche","Tá sé meán lae","Tá sé a dó dhéag san oíche","Tá sé a haon ar maidin"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sé a cúig a chlog", a:"It is five o'clock", ph:"Taw shay uh koo-ig uh khlug", opts:["It is five o'clock","It is four o'clock","It is six o'clock","It is five past"] },
+          { type:'bridge', q:"What does this mean?", irish:"ar maidin", a:"in the morning", ph:"er mah-jin", opts:["in the morning","in the evening","at night","at lunchtime"] },
+          { type:'bridge', q:"What does this mean?", irish:"um thráthnóna", a:"in the evening", ph:"um raw-noh-na", opts:["in the evening","in the morning","at night","at noon"] },
+          { type:'bridge', q:"What does this mean?", irish:"leathuair tar éis a dó", a:"half past two", ph:"lya-hoor tar aysh uh doh", opts:["half past two","quarter past two","twenty past two","two o'clock"] },
+          { type:'bridge', q:"What does this mean?", irish:"meán lae", a:"midday / noon", ph:"myan lay", opts:["midday / noon","midnight","lunchtime","afternoon"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cén lá é inniu?", a:"What day is it today?", ph:"Kayn law ay in-yoo", opts:["What day is it today?","What time is it?","What is the date?","What year is it?"] },
+          { type:'mc', q:"'At what time?' — how do you ask?", a:"Cén t-am?", ph:"Kayn tom", opts:["Cén t-am?","Cad é an t-am?","Cén uair?","Cathain?"] },
+          { type:'typed', q:"Type: 'What time is it?'", a:"Cén t-am é?", ph:"Kayn tom ay", alt:["cen t-am e","cén t-am é"] },
+          { type:'typed', q:"Type: 'in the morning'", a:"ar maidin", ph:"er mah-jin", alt:["ar maidin"] },
+          { type:'typed', q:"Type: 'at night'", a:"san oíche", ph:"sun ee-ha", alt:["san oiche","san oíche"] },
+        ]
+      },
+      {
+        name: 'Bia agus Deoch',
+        desc: 'Food and drink',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'I am hungry'?", a:"Tá ocras orm", ph:"Taw ukrus urrum", opts:["Tá ocras orm","Tá tart orm","Tá mé ag ithe","Tá ocras agam"] },
+          { type:'mc', q:"How do you say 'I am thirsty'?", a:"Tá tart orm", ph:"Taw tort urrum", opts:["Tá tart orm","Tá ocras orm","Tá mé ag ól","Tá tart agam"] },
+          { type:'mc', q:"How do you say 'a cup of tea'?", a:"cupán tae", ph:"kup-awn tay", opts:["cupán tae","gloine fíona","pionta beorach","buidéal uisce"] },
+          { type:'mc', q:"How do you say 'a pint of beer'?", a:"pionta beorach", ph:"pyun-ta byoh-rukh", opts:["pionta beorach","gloine fíona","cupán tae","buidéal uisce"] },
+          { type:'mc', q:"How do you say 'a glass of wine'?", a:"gloine fíona", ph:"glin-eh fee-un-a", opts:["gloine fíona","pionta beorach","cupán tae","buidéal uisce"] },
+          { type:'mc', q:"How do you say 'a bottle of water'?", a:"buidéal uisce", ph:"bwid-jale ish-keh", opts:["buidéal uisce","gloine uisce","cupán uisce","pionta uisce"] },
+          { type:'mc', q:"How do you say 'The food is lovely'?", a:"Tá an bia go hálainn", ph:"Taw un bee-uh guh haw-lin", opts:["Tá an bia go hálainn","Tá an bia go dona","Tá mé sásta","Is maith liom an bia"] },
+          { type:'mc', q:"How do you say 'I am full'?", a:"Tá mé lán", ph:"Taw may lawn", opts:["Tá mé lán","Tá mé sásta","Tá ocras orm","Tá mé ag ithe"] },
+          { type:'mc', q:"How do you say 'bread'?", a:"arán", ph:"or-awn", opts:["arán","im","cáis","uibheacha"] },
+          { type:'mc', q:"How do you say 'butter'?", a:"im", ph:"im", opts:["im","arán","cáis","bainne"] },
+          { type:'mc', q:"How do you say 'cheese'?", a:"cáis", ph:"kawsh", opts:["cáis","im","arán","uibheacha"] },
+          { type:'mc', q:"How do you say 'eggs'?", a:"uibheacha", ph:"iv-ukha", opts:["uibheacha","iasc","feoil","sicín"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá ocras orm", a:"I am hungry", ph:"Taw ukrus urrum", opts:["I am hungry","I am thirsty","I am full","I am tired"] },
+          { type:'bridge', q:"What does this mean?", irish:"cupán tae", a:"a cup of tea", ph:"kup-awn tay", opts:["a cup of tea","a glass of wine","a pint of beer","a bottle of water"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé lán", a:"I am full", ph:"Taw may lawn", opts:["I am full","I am hungry","I am satisfied","I am thirsty"] },
+          { type:'bridge', q:"What does this mean?", irish:"arán", a:"bread", ph:"or-awn", opts:["bread","butter","cheese","cake"] },
+          { type:'bridge', q:"What does this mean?", irish:"gloine fíona", a:"a glass of wine", ph:"glin-eh fee-un-a", opts:["a glass of wine","a glass of water","a glass of beer","a glass of milk"] },
+          { type:'mc', q:"'Can I have a cup of tea please?' — closest?", a:"An féidir liom cupán tae a fháil, más é do thoil é?", ph:"Un fay-dir lum kup-awn tay uh awl", opts:["An féidir liom cupán tae a fháil, más é do thoil é?","Tá mé ag iarraidh tae","Cupán tae, le do thoil","Ba mhaith liom cupán tae"] },
+          { type:'typed', q:"Type: 'I am hungry'", a:"Tá ocras orm", ph:"Taw ukrus urrum", alt:["ta ocras orm","tá ocras orm"] },
+          { type:'typed', q:"Type: 'a cup of tea'", a:"cupán tae", ph:"kup-awn tay", alt:["cupan tae","cupán tae"] },
+          { type:'typed', q:"Type: 'bread'", a:"arán", ph:"or-awn", alt:["aran","arán"] },
+        ]
+      },
+      {
+        name: 'Comhrá Beag',
+        desc: 'Small talk — the first real conversation',
+        timeLimit: 22,
+        qs: [
+          { type:'mc', q:"How do you say 'I am learning Irish'?", a:"Tá mé ag foghlaim Gaeilge", ph:"Taw may eg owl-im Gway-el-ga", opts:["Tá mé ag foghlaim Gaeilge","Tá Gaeilge agam","Is maith liom Gaeilge","Labhraím Gaeilge"] },
+          { type:'mc', q:"How do you say 'My Irish is a little rusty'?", a:"Tá mo chuid Gaeilge beagán meirgeach", ph:"Taw muh khwid Gway-el-ga byug-awn meh-rig-ukh", opts:["Tá mo chuid Gaeilge beagán meirgeach","Níl Gaeilge agam","Tá Gaeilge mhaith agam","Is maith liom Gaeilge"] },
+          { type:'mc', q:"How do you say 'How do you say... in Irish?'", a:"Conas a deirtear... i nGaeilge?", ph:"Kun-us uh djer-chur... i nGway-el-ga", opts:["Conas a deirtear... i nGaeilge?","Cad is brí le...?","Cá bhfuil...?","Cén chaoi...?"] },
+          { type:'mc', q:"How do you say 'I understand a little'?", a:"Tuigim beagán", ph:"Tig-im byug-awn", opts:["Tuigim beagán","Ní thuigim","Tuigim go maith","Tuigim go léir"] },
+          { type:'mc', q:"How do you say 'I don't understand'?", a:"Ní thuigim", ph:"Nee hig-im", opts:["Ní thuigim","Tuigim","Tuigim beagán","Ní chloisim"] },
+          { type:'mc', q:"How do you say 'Can you say that again?'", a:"An féidir leat é sin a rá arís?", ph:"Un fay-dir lyat ay shin uh raw ah-reesh", opts:["An féidir leat é sin a rá arís?","Cad a dúirt tú?","Níl a fhios agam","Cén chaoi?"] },
+          { type:'mc', q:"How do you say 'Speak slowly please'?", a:"Labhair go mall, más é do thoil é", ph:"Low-ir guh mowl maws ay duh hull ay", opts:["Labhair go mall, más é do thoil é","Labhair go tapaidh","Labhraimid Gaeilge","Ná labhair"] },
+          { type:'mc', q:"How do you say 'My Irish is coming back'?", a:"Tá mo chuid Gaeilge ag teacht ar ais", ph:"Taw muh khwid Gway-el-ga eg chakht er ash", opts:["Tá mo chuid Gaeilge ag teacht ar ais","Tá Gaeilge agam arís","Tá mé ag foghlaim Gaeilge","Tá mo Ghaeilge maith"] },
+          { type:'mc', q:"How do you say 'I love the Irish language'?", a:"Is breá liom an Ghaeilge", ph:"Iss braw lum un Wway-el-ga", opts:["Is breá liom an Ghaeilge","Is maith liom Gaeilge","Tá mé ag foghlaim Gaeilge","Tá Gaeilge agam"] },
+          { type:'mc', q:"How do you say 'I have been learning for six months'?", a:"Tá mé ag foghlaim le sé mhí", ph:"Taw may eg owl-im leh shay vee", opts:["Tá mé ag foghlaim le sé mhí","Tá sé mhí agam","Tá mé ag foghlaim sé mhí","Foghlaím le sé mhí"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé ag foghlaim Gaeilge", a:"I am learning Irish", ph:"Taw may eg owl-im Gway-el-ga", opts:["I am learning Irish","I like Irish","I have Irish","I speak Irish"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tuigim beagán", a:"I understand a little", ph:"Tig-im byug-awn", opts:["I understand a little","I don't understand","I understand well","I understand everything"] },
+          { type:'bridge', q:"What does this mean?", irish:"Ní thuigim", a:"I don't understand", ph:"Nee hig-im", opts:["I don't understand","I understand","I don't hear","I don't know"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mo chuid Gaeilge ag teacht ar ais", a:"My Irish is coming back", ph:"Taw muh khwid Gway-el-ga eg chakht er ash", opts:["My Irish is coming back","My Irish is good","I am learning Irish","My Irish is rusty"] },
+          { type:'bridge', q:"What does this mean?", irish:"Labhair go mall", a:"Speak slowly", ph:"Low-ir guh mowl", opts:["Speak slowly","Speak quickly","Speak louder","Don't speak"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is breá liom an Ghaeilge", a:"I love the Irish language", ph:"Iss braw lum un Wway-el-ga", opts:["I love the Irish language","I like Irish","I am learning Irish","Irish is beautiful"] },
+          { type:'mc', q:"'Broken Irish is better than clever English' — what is this proverb?", a:"Is fearr Gaeilge bhriste ná Béarla cliste", ph:"Iss far Gway-el-ga vrish-teh naw Bayr-luh klish-teh", opts:["Is fearr Gaeilge bhriste ná Béarla cliste","Is maith an rud Gaeilge","Ní neart go cur le chéile","Mol an óige agus tiocfaidh sí"] },
+          { type:'bridge', q:"What does this proverb mean?", irish:"Is fearr Gaeilge bhriste ná Béarla cliste", a:"Broken Irish is better than clever English", ph:"Iss far Gway-el-ga vrish-teh naw Bayr-luh klish-teh", opts:["Broken Irish is better than clever English","Irish is better than English","Speak Irish not English","A little Irish goes a long way"] },
+          { type:'typed', q:"Type: 'I am learning Irish'", a:"Tá mé ag foghlaim Gaeilge", ph:"Taw may eg owl-im Gway-el-ga", alt:["ta me ag foghlaim gaeilge","tá mé ag foghlaim gaeilge"] },
+          { type:'typed', q:"Type: 'I understand a little'", a:"Tuigim beagán", ph:"Tig-im byug-awn", alt:["tuigim beagan","tuigim beagán"] },
+          { type:'typed', q:"Type: 'I don't understand'", a:"Ní thuigim", ph:"Nee hig-im", alt:["ni thuigim","ní thuigim"] },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'A2',
+    name: 'Bunleibhéal',
+    desc: 'Building sentences. Present tense, talking about yourself, simple questions.',
+    badge: '🌿',
+    badgeIrish: 'Beagán ar bheagán.',
+    badgeIrishEn: 'Little by little.',
+    loops: [
+      {
+        name: 'Is nó Tá?',
+        desc: 'Is vs Tá — two ways to say \'to be\'',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"'He is a teacher' — use the copula", a:"Is múinteoir é", ph:"Iss mween-tore ay", opts:["Is múinteoir é","Tá sé múinteoir","Is múinteoir sé","Tá múinteoir é"] },
+          { type:'mc', q:"'I am Irish' (identity) — which is correct?", a:"Is Éireannach mé", ph:"Iss ayr-un-ukh may", opts:["Is Éireannach mé","Tá mé Éireannach","Is mé Éireannach","Tá Éireannach mé"] },
+          { type:'mc', q:"'I like music' — which is correct?", a:"Is maith liom ceol", ph:"Iss mah lum kyole", opts:["Is maith liom ceol","Tá mé ag maith ceol","Tá liom ceol","Is liom ceol"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is múinteoir mé", a:"I am a teacher", ph:"Iss mween-tore may", opts:["I am a teacher","I am tired","I like teaching","He is a teacher"] },
+          { type:'mc', q:"'I don't like it' — which is correct?", a:"Ní maith liom é", ph:"Nee mah lum ay", opts:["Ní maith liom é","Níl maith liom é","Is maith liom é","Ní liom é"] },
+          { type:'mc', q:"'She is a student' — use the copula", a:"Is mac léinn í", ph:"Iss mock layn ee", opts:["Is mac léinn í","Tá sí mac léinn","Is mac léinn sí","Tá mac léinn í"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is maith liom Gaeilge", a:"I like Irish", ph:"Iss mah lum Gway-el-ga", opts:["I like Irish","I speak Irish","I am Irish","Irish is good"] },
+          { type:'typed', q:"Type: 'I like Irish'", a:"Is maith liom Gaeilge", ph:"Iss mah lum Gway-el-ga", alt:["is maith liom gaeilge"] },
+        ]
+      },
+      {
+        name: 'Mé Féin',
+        desc: 'Talking about yourself',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"'I am from Dublin' — which is correct?", a:"Is as Baile Átha Cliath mé", ph:"Iss ass Blaw Klee-uh may", opts:["Is as Baile Átha Cliath mé","Tá mé as Baile Átha Cliath","Is mé as Baile Átha Cliath","Tá mé i mBaile Átha Cliath"] },
+          { type:'mc', q:"'I have Irish' (I know it) — which is correct?", a:"Tá Gaeilge agam", ph:"Taw Gway-el-ga agum", opts:["Tá Gaeilge agam","Tá Gaeilge liom","Is maith liom Gaeilge","Tá mé Gaeilge"] },
+          { type:'mc', q:"'I am married' — which is correct?", a:"Tá mé pósta", ph:"Taw may poh-sta", opts:["Tá mé pósta","Is pósta mé","Tá mé i bpósadh","Tá mé singil"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá Gaeilge agam", a:"I have Irish / I know Irish", ph:"Taw Gway-el-ga agum", opts:["I have Irish / I know Irish","I like Irish","I am learning Irish","I speak Irish well"] },
+          { type:'mc', q:"'I live in Dublin' — which is correct?", a:"Cónaím i mBaile Átha Cliath", ph:"Koh-neem i mBlaw Klee-uh", opts:["Cónaím i mBaile Átha Cliath","Tá mé i mBaile Átha Cliath","Is i mBaile Átha Cliath mé","Tá mé ag cónaí"] },
+          { type:'mc', q:"'I have two children' — which is correct?", a:"Tá beirt pháistí agam", ph:"Taw bersht fawsh-tee agum", opts:["Tá beirt pháistí agam","Tá dhá páistí agam","Tá páistí agam","Is beirt páistí agam"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cónaím i mBaile Átha Cliath", a:"I live in Dublin", ph:"Koh-neem i mBlaw Klee-uh", opts:["I live in Dublin","I am from Dublin","I work in Dublin","I was born in Dublin"] },
+          { type:'typed', q:"Type: 'I live in Dublin'", a:"Cónaím i mBaile Átha Cliath", ph:"Koh-neem i mBlaw Klee-uh", alt:["conaim i mbaile atha cliath","cónaím i mbaile átha cliath"] },
+        ]
+      },
+      {
+        name: 'Mo Phost',
+        desc: 'Your job — what you do',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you ask 'What is your job?'", a:"Cén post atá agat?", ph:"Kayn pust ah-taw agut", opts:["Cén post atá agat?","Cad is ainm duit?","Cá bhfuil tú?","Cén chaoi a bhfuil tú?"] },
+          { type:'mc', q:"'I am a teacher' — which is correct?", a:"Is múinteoir mé", ph:"Iss mween-tore may", opts:["Is múinteoir mé","Tá mé múinteoir","Is mé múinteoir","Tá múinteoir mé"] },
+          { type:'mc', q:"'I work in a school' — which is correct?", a:"Oibríonn mé i scoil", ph:"Ib-reen may i skull", opts:["Oibríonn mé i scoil","Tá mé ag obair scoil","Is scoil mé","Oibríonn scoil mé"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cén post atá agat?", a:"What is your job?", ph:"Kayn pust ah-taw agut", opts:["What is your job?","Where do you work?","Do you work?","What do you study?"] },
+          { type:'mc', q:"'I have been teaching for ten years' — which is correct?", a:"Tá mé ag múineadh le deich mbliana", ph:"Taw may eg mween-uh le djeh mleeuna", opts:["Tá mé ag múineadh le deich mbliana","Múinim le deich mbliana","Bhí mé ag múineadh deich mbliana","Tá deich mbliana agam"] },
+          { type:'mc', q:"'I teach languages' — which is correct?", a:"Múinim teangacha", ph:"Mween-im chyang-ukha", opts:["Múinim teangacha","Is múinteoir teangacha","Tá teangacha agam","Oibríonn mé teangacha"] },
+          { type:'bridge', q:"What does this mean?", irish:"Múinim teangacha", a:"I teach languages", ph:"Mween-im chyang-ukha", opts:["I teach languages","I like languages","I learn languages","I speak languages"] },
+          { type:'typed', q:"Type: 'I am a teacher'", a:"Is múinteoir mé", ph:"Iss mween-tore may", alt:["is muinteoir me","is múinteoir mé"] },
+        ]
+      },
+      {
+        name: 'Ceisteanna Simplí',
+        desc: 'Simple questions — asking and answering',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you ask 'Where are you from?'", a:"Cad as duit?", ph:"Kod ass ditch", opts:["Cad as duit?","Cá bhfuil tú?","Cé thú féin?","Cad is ainm duit?"] },
+          { type:'mc', q:"How do you ask 'Do you have Irish?'", a:"An bhfuil Gaeilge agat?", ph:"Un will Gway-el-ga agut", opts:["An bhfuil Gaeilge agat?","Labhraíonn tú Gaeilge?","An maith leat Gaeilge?","Tá Gaeilge agat?"] },
+          { type:'mc', q:"How do you say 'a little' (of something)?", a:"beagán", ph:"byug-awn", opts:["beagán","go leor","ar chor ar bith","i bhfad"] },
+          { type:'bridge', q:"What does this mean?", irish:"Cad as duit?", a:"Where are you from?", ph:"Kod ass ditch", opts:["Where are you from?","Who are you?","What is your name?","Where are you going?"] },
+          { type:'mc', q:"How do you say 'Do you understand?'", a:"An dtuigeann tú?", ph:"Un dig-un too", opts:["An dtuigeann tú?","An bhfuil tú ceart?","An gcloiseann tú?","An bhfuil tú anseo?"] },
+          { type:'mc', q:"How do you say 'I don't understand'?", a:"Ní thuigim", ph:"Nee hig-im", opts:["Ní thuigim","Tuigim","Ní chloisim","Ní fheicim"] },
+          { type:'bridge', q:"What does this mean?", irish:"Ní thuigim", a:"I don't understand", ph:"Nee hig-im", opts:["I don't understand","I understand","I don't hear","I don't know"] },
+          { type:'typed', q:"Type: 'a little'", a:"beagán", ph:"byug-awn", alt:["beagan","beagán"] },
+        ]
+      },
+      {
+        name: 'Tuairimí',
+        desc: 'Opinions — what you think and feel',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'I think that...'?", a:"Ceapaim go...", ph:"Kap-im guh", opts:["Ceapaim go...","Tá mé ag ceapadh...","Is dóigh liom...","Measaim go..."] },
+          { type:'mc', q:"How do you say 'I love it'?", a:"Is breá liom é", ph:"Iss braw lum ay", opts:["Is breá liom é","Is maith liom é","Ní maith liom é","Is fuath liom é"] },
+          { type:'mc', q:"How do you say 'I hate it'?", a:"Is fuath liom é", ph:"Iss foo-uh lum ay", opts:["Is fuath liom é","Is maith liom é","Is breá liom é","Is cuma liom é"] },
+          { type:'bridge', q:"What does this mean?", irish:"Is breá liom é", a:"I love it", ph:"Iss braw lum ay", opts:["I love it","I like it","I hate it","I don't care about it"] },
+          { type:'mc', q:"How do you say 'I don't mind / I don't care'?", a:"Is cuma liom", ph:"Iss kum-uh lum", opts:["Is cuma liom","Is maith liom","Is fuath liom","Tá mé sásta"] },
+          { type:'mc', q:"How do you say 'That's great!'?", a:"Tá sin go hiontach!", ph:"Taw shin guh hun-tukh", opts:["Tá sin go hiontach!","Tá sin go dona!","Tá sin ceart go leor","Tá sin aisteach"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá sin go hiontach!", a:"That's wonderful / great!", ph:"Taw shin guh hun-tukh", opts:["That's wonderful / great!","That's terrible!","That's fine!","That's strange!"] },
+          { type:'typed', q:"Type: 'I love it'", a:"Is breá liom é", ph:"Iss braw lum ay", alt:["is brea liom e","is breá liom é"] },
+        ]
+      },
+      {
+        name: 'Laethanta & Míonna',
+        desc: 'Days and months',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'Monday'?", a:"Dé Luain", ph:"Djay loo-in", opts:["Dé Luain","Dé Máirt","Dé Céadaoin","Déardaoin"] },
+          { type:'mc', q:"How do you say 'Friday'?", a:"Dé hAoine", ph:"Djay hee-neh", opts:["Dé hAoine","Dé Luain","Dé Sathairn","Dé Domhnaigh"] },
+          { type:'bridge', q:"What day is this?", irish:"Dé Sathairn", a:"Saturday", ph:"Djay sah-hirn", opts:["Saturday","Sunday","Friday","Thursday"] },
+          { type:'mc', q:"How do you say 'January'?", a:"Eanáir", ph:"An-aw-ir", opts:["Eanáir","Feabhra","Márta","Aibreán"] },
+          { type:'mc', q:"How do you say 'summer'?", a:"an samhradh", ph:"un sow-ruh", opts:["an samhradh","an geimhreadh","an t-earrach","an fómhar"] },
+          { type:'bridge', q:"What season is this?", irish:"an geimhreadh", a:"winter", ph:"un gyev-ruh", opts:["winter","summer","spring","autumn"] },
+          { type:'mc', q:"How do you say 'today'?", a:"inniu", ph:"in-yoo", opts:["inniu","inné","amárach","arú inné"] },
+          { type:'typed', q:"Type: 'today'", a:"inniu", ph:"in-yoo", alt:["inniu"] },
+        ]
+      },
+      {
+        name: 'An Aimsir Láithreach',
+        desc: 'Present tense verbs — actions now',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"'I am reading' — which is correct?", a:"Tá mé ag léamh", ph:"Taw may eg lyave", opts:["Tá mé ag léamh","Léim","Tá mé léamh","Is maith liom léamh"] },
+          { type:'mc', q:"'She is working' — which is correct?", a:"Tá sí ag obair", ph:"Taw shee eg ub-ir", opts:["Tá sí ag obair","Oibríonn sí","Tá sí obair","Is sí ag obair"] },
+          { type:'mc', q:"'They are talking' — which is correct?", a:"Tá siad ag caint", ph:"Taw shee-ud eg konch", opts:["Tá siad ag caint","Cainteann siad","Tá siad caint","Is siad ag caint"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá mé ag ithe", a:"I am eating", ph:"Taw may eg ih-heh", opts:["I am eating","I am drinking","I am cooking","I am hungry"] },
+          { type:'mc', q:"'I go to school every day' — which is correct?", a:"Téim ar scoil gach lá", ph:"Chayim er skull gokh law", opts:["Téim ar scoil gach lá","Tá mé ag dul ar scoil","Tá mé ar scoil","Is scoil mé"] },
+          { type:'mc', q:"'He speaks Irish well' — which is correct?", a:"Labhraíonn sé Gaeilge go maith", ph:"Low-reen shay Gway-el-ga guh mah", opts:["Labhraíonn sé Gaeilge go maith","Tá sé ag labhairt Gaeilge","Tá Gaeilge mhaith aige","Labhrann sé Gaeilge"] },
+          { type:'bridge', q:"What does this mean?", irish:"Téim ar scoil gach lá", a:"I go to school every day", ph:"Chayim er skull gokh law", opts:["I go to school every day","I am going to school","I went to school","I like school"] },
+          { type:'typed', q:"Type: 'I am eating'", a:"Tá mé ag ithe", ph:"Taw may eg ih-heh", alt:["ta me ag ithe","tá mé ag ithe"] },
+        ]
+      },
+      {
+        name: 'Ag Casadh le Daoine',
+        desc: 'Meeting people — real conversation',
+        timeLimit: 20,
+        qs: [
+          { type:'mc', q:"How do you say 'I am delighted to meet you'?", a:"Tá áthas orm bualadh leat", ph:"Taw aw-hus urrum boo-luh lyat", opts:["Tá áthas orm bualadh leat","Is deas bualadh leat","Tá fáilte romhat","Go raibh maith agat"] },
+          { type:'mc', q:"How do you say 'I have been learning Irish for a year'?", a:"Tá mé ag foghlaim Gaeilge le bliain", ph:"Taw may eg owl-im Gway-el-ga le blee-in", opts:["Tá mé ag foghlaim Gaeilge le bliain","Tá bliain agam","Foghlaímím Gaeilge bliain","Tá mé bliain ag foghlaim"] },
+          { type:'mc', q:"How do you say 'Your Irish is very good'?", a:"Tá do chuid Gaeilge an-mhaith", ph:"Taw duh khwid Gway-el-ga un-wah", opts:["Tá do chuid Gaeilge an-mhaith","Is maith do Ghaeilge","Tá Gaeilge agat","Labhraíonn tú Gaeilge go maith"] },
+          { type:'bridge', q:"What does this mean?", irish:"Tá áthas orm bualadh leat", a:"I am delighted to meet you", ph:"Taw aw-hus urrum boo-luh lyat", opts:["I am delighted to meet you","Nice to meet you","You are welcome","I am glad you are here"] },
+          { type:'mc', q:"How do you say 'Of course!'?", a:"Ar ndóigh!", ph:"Er noh-ee", opts:["Ar ndóigh!","Is ea!","Go díreach!","Ceart go leor!"] },
+          { type:'mc', q:"How do you say 'Exactly! / That's right!'?", a:"Go díreach!", ph:"Guh djee-rukh", opts:["Go díreach!","Ar ndóigh!","Is cuma!","Níl a fhios agam"] },
+          { type:'bridge', q:"What does this mean?", irish:"Ar ndóigh!", a:"Of course!", ph:"Er noh-ee", opts:["Of course!","Exactly!","Not at all!","I don't know!"] },
+          { type:'typed', q:"Type: 'Of course!'", a:"Ar ndóigh!", ph:"Er noh-ee", alt:["ar ndoigh","ar ndóigh"] },
+        ]
+      },
+    ]
+  },
+];
+
+
+// ─────────────────────────────────────────────────────────────
+// SOUNDS
+// ─────────────────────────────────────────────────────────────
+let audioCtx = null;
+
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function ding() {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.6);
+  } catch(e) {}
+}
+
+function dong() {
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.7);
+  } catch(e) {}
+}
+
+function chime() {
+  // Three rising tones for badge/level complete
+  try {
+    const ctx = getAudio();
+    [523, 659, 784].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.35, ctx.currentTime + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.5);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.5);
+    });
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+const SAVE_KEY = 'turboIrishV3';
+let save = JSON.parse(localStorage.getItem(SAVE_KEY) || '{"lives":5,"levels":{}}');
+
+let G = {
+  level: null,
+  loopIdx: 0,
+  queue: [],
+  qi: 0,
+  answered: false,
+  score: 0,
+  stars: 0,
+  hintUsed: false,
+  timeouts: 0,
+  wrongs: 0,
+  requeued: null,
+  timer: null,
+  t: 0,
+};
+
+// ─────────────────────────────────────────────────────────────
+// PERSIST
+// ─────────────────────────────────────────────────────────────
+function persist() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+function init() {
+  renderLives();
+  buildHome();
+  show('homeScreen');
+}
+
+function handleStart() {
+  // Update button text for return visits
+  const anyProgress = Object.keys(save.levels).length > 0 || (save.lives < 5);
+  const btnText = document.getElementById('startBtnText');
+  if (btnText && anyProgress) btnText.textContent = 'Lean ar aghaidh · Continue the journey';
+  // Find where player is — resume from last incomplete loop
+  for (let i = 0; i < LEVELS.length; i++) {
+    const lv = LEVELS[i];
+    const lvSave = save.levels[lv.id] || {};
+    if (!lvSave.badge) {
+      G.level = lv;
+      G.loopIdx = lvSave.loopsDone || 0;
+      if (G.loopIdx >= lv.loops.length) G.loopIdx = 0;
+      startLoop(G.loopIdx);
+      return;
+    }
+  }
+  // All done — restart from A1
+  G.level = LEVELS[0];
+  G.loopIdx = 0;
+  startLoop(0);
+}
+
+function showLevels() {
+  buildLevelsScreen();
+  show('levelsScreen');
+}
+
+function buildLevelsScreen() {
+  buildHome(); // reuse existing buildHome which populates levelsWrap
+}
+
+function renderLives() {
+  const el = document.getElementById('livesDisplay');
+  const lives = Math.min(save.lives, 5);
+  el.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'life' + (i >= lives ? ' empty' : '');
+    s.textContent = '💚';
+    el.appendChild(s);
+  }
+}
+
+function buildHome() {
+
+  // Current badge icon — moon until earned
+  const earnedLevels = LEVELS.filter(lv => (save.levels[lv.id] || {}).badge);
+  const moons = ['🌑','🌒','🌓','🌔'];
+  let currentIcon;
+  if (earnedLevels.length === 0) currentIcon = '🌑';
+  else if (earnedLevels.length === LEVELS.length) currentIcon = '🌕';
+  else currentIcon = earnedLevels[earnedLevels.length - 1].badge;
+  const iconEl = document.getElementById('homeIcon');
+  if (iconEl) iconEl.textContent = currentIcon;
+
+  // Badge collection — moons for unearned, badge for earned
+  const badgeRow = LEVELS.map((lv, i) => {
+    const earned = (save.levels[lv.id] || {}).badge;
+    return earned ? lv.badge : moons[Math.min(i, moons.length-1)];
+  }).join(' ');
+  const badgeEl = document.getElementById('badgeCollection');
+  if (badgeEl) {
+    badgeEl.textContent = badgeRow;
+    badgeEl.style.opacity = '0.5';
+    // Brighten earned ones
+    // Can't do per-emoji but fade the whole row subtly
+  }
+
+
+  // Show levels link if any progress
+  const anyProgress = Object.keys(save.levels).length > 0;
+  const link = document.getElementById('homeLevelsLink');
+  if (link) link.style.display = anyProgress ? 'block' : 'none';
+
+  // Home message
+  const msgEl = document.getElementById('homeMsg');
+  if (msgEl) {
+    const earnedCount = LEVELS.filter(lv => (save.levels[lv.id]||{}).badge).length;
+    if (earnedCount === 0) msgEl.textContent = 'Foghlaim Gaeilge · Learn Irish';
+    else if (earnedCount < LEVELS.length) msgEl.textContent = `${earnedCount} suaitheantas · badge${earnedCount > 1 ? 's' : ''} earned. Lean ar aghaidh · Keep going.`;
+    else msgEl.textContent = 'Déanta! · Complete! Tá Gaeilge agat!';
+  }
+
+
+  // Random encouragement
+  const encs = ['Is fearr Gaeilge bhriste ná Béarla cliste · Broken Irish is better than clever English', 'Beagán ar bheagán · Little by little', 'Ní neart go cur le chéile · Strength in unity', 'Mol an óige agus tiocfaidh sí · Praise the young and they will flourish', 'Tús maith is leath na hoibre · A good start is half the work', "Ar scáth a chéile a mhaireann na daoine · People live in each other's shadow", 'Ní bheidh ár leithéidí arís ann · The likes of us will not be seen again'];
+  const encEl = document.getElementById('homeEncouragement');
+  if (encEl) encEl.textContent = encs[Math.floor(Math.random() * encs.length)];
+
+  const wrap = document.getElementById('levelsWrap');
+  wrap.innerHTML = '';
+  LEVELS.forEach((lv, idx) => {
+    const lvSave = save.levels[lv.id] || {};
+    const prev = idx === 0 ? true : !!(save.levels[LEVELS[idx-1].id] || {}).badge;
+    const unlocked = prev;
+    const loopsDone = lvSave.loopsDone || 0;
+    const hasBadge = !!lvSave.badge;
+
+    const row = document.createElement('div');
+    row.className = 'level-row' + (!unlocked ? ' locked' : '') + (hasBadge ? ' earned' : '');
+    row.onclick = () => { if (unlocked) openLevel(lv.id); };
+
+    const badgeCol = document.createElement('div');
+    badgeCol.className = 'lv-badge-col' + (hasBadge ? ' earned-badge' : '');
+    badgeCol.textContent = hasBadge ? lv.badge : (unlocked ? lv.badge : '🔒');
+
+    const info = document.createElement('div');
+    info.className = 'lv-info';
+    info.innerHTML = `
+      <div class="lv-name">${hasBadge ? lv.id + " — " : ""}${lv.name}</div>
+      <div class="lv-desc">${lv.desc}</div>
+      ${unlocked ? `<div class="lv-progress">${hasBadge ? '✓ Críochnaithe · Complete' : `Lúb ${loopsDone}/${lv.loops.length} · Loop`}</div>` : ''}
+    `;
+
+    row.appendChild(badgeCol);
+    row.appendChild(info);
+    if (!unlocked) {
+      const lock = document.createElement('div');
+      lock.className = 'lv-lock';
+      lock.textContent = '🔒';
+      row.appendChild(lock);
+    }
+    wrap.appendChild(row);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// OPEN LEVEL
+// ─────────────────────────────────────────────────────────────
+function openLevel(id) {
+  G.level = LEVELS.find(l => l.id === id);
+  const lvSave = save.levels[id] || {};
+  G.loopIdx = lvSave.loopsDone || 0;
+  if (G.loopIdx >= G.level.loops.length) G.loopIdx = 0; // replay
+
+  document.getElementById('introBadge').textContent = G.level.badge;
+  document.getElementById('introLevel').textContent = G.level.id;
+  document.getElementById('introName').textContent = G.level.name;
+  document.getElementById('introDesc').textContent = G.level.desc;
+  document.getElementById('introLoops').textContent = `${G.level.loops.length} lúb · loops — ${G.level.loops.length * 8} ceist · questions`;
+  show('introScreen');
+}
+
+function startFirstLoop() {
+  startLoop(G.loopIdx);
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOOP
+// ─────────────────────────────────────────────────────────────
+function startLoop(idx) {
+  G.loopIdx = idx;
+  const loop = G.level.loops[idx];
+  G.queue = buildQueue(loop.qs);
+  G.qi = 0;
+  G.score = 0;
+  G.stars = 0;
+  G.answered = false;
+  G.timeouts = 0;
+  G.wrongs = 0;
+  G.requeued = new Set(); // fresh set per loop
+
+  document.getElementById('gInfo').textContent = `${G.level.id} · ${loop.name}`;
+  document.getElementById('gStars').textContent = '0';
+  show('gameScreen');
+  renderQ();
+}
+
+function buildQueue(qs) {
+  const expanded = [...qs]; // keep every original question
+
+  qs.forEach(q => {
+    // From MC "How do you say X?" — add a bridge: show Irish, pick English
+    if (q.type === 'mc') {
+      const gloss = q.q.match(/How do you say '(.+?)'\??/i);
+      if (gloss && q.ph) {
+        const distractors = qs
+          .filter(o => o !== q)
+          .map(o => { const m = o.q.match(/How do you say '(.+?)'\??/i); return m ? m[1] : null; })
+          .filter(Boolean);
+        const bridgeOpts = shuffle([gloss[1], ...distractors]).slice(0, 4);
+        // Always ensure correct answer is in opts
+        const finalOpts = [gloss[1], ...shuffle(distractors.filter(d => d !== gloss[1])).slice(0,3)];
+        if (finalOpts.length === 4) {
+          expanded.push({ type:'bridge', q:'What does this mean?', irish:q.a, a:gloss[1], ph:q.ph, opts:shuffle(finalOpts) });
+        }
+      }
+    }
+
+    // From bridge — add reverse MC: English prompt, pick Irish
+    if (q.type === 'bridge' && q.irish) {
+      const irishPool = qs
+        .filter(o => o !== q && o.type === 'bridge' && o.irish && o.irish !== q.irish)
+        .map(o => o.irish);
+      const revOpts = [q.irish, ...shuffle(irishPool.filter(i => i !== q.irish)).slice(0,3)];
+      if (revOpts.length === 4) {
+        expanded.push({ type:'mc', q:`How do you say '${q.a}' in Irish?`, a:q.irish, ph:q.ph, opts:shuffle(revOpts) });
+      }
+    }
+  });
+
+  // Draw 20 from the richer pool — at least 2 typed
+  const typed = shuffle(expanded.filter(q => q.type === 'typed'));
+  const other = shuffle(expanded.filter(q => q.type !== 'typed'));
+  const typedPick = typed.slice(0, Math.min(3, typed.length));
+  const otherPick = other.slice(0, Math.max(0, 20 - typedPick.length));
+  // MC first, bridge middle, typed last — but within each group shuffled
+  const mcItems = otherPick.filter(q => q.type === 'mc');
+  const brItems = otherPick.filter(q => q.type === 'bridge');
+  return [...shuffle(mcItems), ...shuffle(brItems), ...typedPick];
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER Q
+// ─────────────────────────────────────────────────────────────
+function renderQ() {
+  const q = G.queue[G.qi];
+  G.answered = false;
+  G.hintUsed = false;
+
+  document.getElementById('qProg').textContent = `${G.qi + 1} / 20`;
+  const pct = Math.round((G.qi / 20) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('fb').className = 'fb';
+  document.getElementById('btnNext').style.display = 'none';
+
+  // Hide all answer areas
+  document.getElementById('mcWrap').style.display = 'none';
+  document.getElementById('bridgeIrish').style.display = 'none';
+  document.getElementById('bridgePh').style.display = 'none';
+  document.getElementById('typedWrap').style.display = 'none';
+  document.getElementById('qIrish').style.display = 'none';
+
+  if (q.type === 'mc') {
+    document.getElementById('qType').textContent = 'Roghnaigh · Choose';
+    document.getElementById('qText').textContent = q.q;
+    document.getElementById('mcWrap').style.display = 'flex';
+    const mhb = document.getElementById('mcHintBtn');
+    mhb.style.display = 'block';
+    mhb.style.pointerEvents = save.lives <= 0 ? 'none' : 'auto';
+    document.getElementById('mcHintLives').textContent = save.lives;
+    document.getElementById('mcHintTxt').style.color = save.lives <= 0 ? '#4a5a4a' : '#8aaa8a';
+    renderMC(q);
+  } else if (q.type === 'bridge') {
+    const bhb = document.getElementById('mcHintBtn');
+    bhb.style.display = 'block';
+    bhb.style.pointerEvents = save.lives <= 0 ? 'none' : 'auto';
+    document.getElementById('mcHintLives').textContent = save.lives;
+    document.getElementById('mcHintTxt').style.color = save.lives <= 0 ? '#4a5a4a' : '#8aaa8a';
+    document.getElementById('qType').textContent = 'Léigh · Read';
+    document.getElementById('qText').textContent = '— ' + q.q;
+    document.getElementById('bridgeIrish').textContent = q.irish;
+    document.getElementById('bridgeIrish').style.display = 'block';
+    document.getElementById('bridgePh').textContent = `/${q.ph}/`;
+    document.getElementById('bridgePh').style.display = 'block';
+    document.getElementById('mcWrap').style.display = 'flex';
+    renderMC(q);
+  } else if (q.type === 'typed') {
+    document.getElementById('mcHintBtn').style.display = 'none';
+    document.getElementById('qType').textContent = 'Scríobh · Write';
+    document.getElementById('qText').textContent = q.q;
+    document.getElementById('typedWrap').style.display = 'block';
+    const inp = document.getElementById('typedInput');
+    inp.value = ''; inp.className = 'typed-input'; inp.disabled = false;
+    updateHintBtn();
+    setTimeout(() => inp.focus(), 80);
+  }
+
+  startTimer(G.level.loops[G.loopIdx].timeLimit);
+}
+
+function renderMC(q) {
+  const wrap = document.getElementById('mcWrap');
+  wrap.innerHTML = '';
+  shuffle([...q.opts]).forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'mc-btn';
+    b.innerHTML = `<span class="mc-txt">${opt}</span><span class="mc-ph">/${q.ph}/</span>`;
+    b.onclick = () => { if (!G.answered) pickMC(opt, q, b); };
+    wrap.appendChild(b);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────────────────────
+function startTimer(limit) {
+  clearInterval(G.timer);
+  G.t = limit;
+  updateBar(limit);
+  G.timer = setInterval(() => {
+    G.t -= 0.1;
+    updateBar(limit);
+    if (G.t <= 0) { clearInterval(G.timer); timeUp(); }
+  }, 100);
+}
+
+function updateBar(limit) {
+  const pct = Math.max(0, (G.t / limit) * 100);
+  const bar = document.getElementById('timerBar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct < 25 ? 'var(--red)' : pct < 50 ? 'var(--gold)' : 'var(--green)';
+}
+
+function timeUp() {
+  if (G.answered) return;
+  G.answered = true;
+  G.timeouts++;
+  dong();
+  const q = G.queue[G.qi];
+  document.querySelectorAll('.mc-btn').forEach(b => {
+    b.classList.add('revealed');
+    if (b.querySelector('.mc-txt').textContent === q.a) b.classList.add('correct');
+  });
+  // Requeue this question
+  const tkey = q.a + q.q;
+  if (!G.requeued.has(tkey)) { G.requeued.add(tkey); G.queue.push({...q}); }
+  showFBTimeout(q);
+}
+
+// ─────────────────────────────────────────────────────────────
+// ANSWERS
+// ─────────────────────────────────────────────────────────────
+function pickMC(chosen, q, btn) {
+  if (G.answered) return;
+  G.answered = true;
+  clearInterval(G.timer);
+  const ok = chosen === q.a;
+  document.querySelectorAll('.mc-btn').forEach(b => {
+    b.classList.add('revealed');
+    const txt = b.querySelector('.mc-txt').textContent;
+    if (txt === q.a) b.classList.add('correct');
+    else if (txt === chosen && !ok) { b.classList.add('wrong'); b.classList.add('faded'); }
+    else if (txt !== q.a) b.classList.add('faded');
+  });
+  if (ok) { G.score++; G.stars += 2; }
+  else {
+    G.wrongs++;
+    const qkey = q.a + q.q;
+    if (G.requeued && !G.requeued.has(qkey)) { G.requeued.add(qkey); G.queue.push({...q}); }
+  }
+  document.getElementById('gStars').textContent = G.stars;
+  showFB(ok, q, false, ok ? 2 : 0, null);
+}
+
+function useHint() {
+  if (save.lives <= 0) return;
+  const q = G.queue[G.qi];
+  save.lives = Math.max(0, save.lives - 1);
+  persist();
+  renderLives();
+  G.hintUsed = true;
+  const inp = document.getElementById('typedInput');
+  inp.value = q.a[0];
+  inp.focus();
+  updateHintBtn();
+}
+
+function updateHintBtn() {
+  const lives = save.lives;
+  const el = document.getElementById('hintLivesCount');
+  if (el) el.textContent = lives;
+  const txt = document.getElementById('hintTxt');
+  if (txt) txt.style.color = lives <= 0 ? '#4a5a4a' : '#7a8a7a';
+  const btn = document.getElementById('hintBtn');
+  if (btn) btn.style.pointerEvents = lives <= 0 ? 'none' : 'auto';
+}
+
+function submitTyped() {
+  if (G.answered) return;
+  const inp = document.getElementById('typedInput');
+  const raw = inp.value.trim();
+  if (!raw) return;
+  G.answered = true;
+  clearInterval(G.timer);
+  const q = G.queue[G.qi];
+  const norm = normalise(raw);
+  const ok = norm === normalise(q.a) || (q.alt||[]).map(normalise).includes(norm) || fuzzy(norm, normalise(q.a));
+  const exactFada = raw.toLowerCase() === q.a.toLowerCase();
+  inp.className = 'typed-input ' + (ok ? 'ok' : 'bad');
+  inp.disabled = true;
+  if (ok) {
+    G.score++;
+    const st = G.hintUsed ? 1 : (exactFada ? 3 : 2);
+    G.stars += st;
+    document.getElementById('gStars').textContent = G.stars;
+    showFB(true, q, exactFada && !G.hintUsed, st, null);
+  } else {
+    G.wrongs++;
+    const qkey = q.a + q.q;
+    if (G.requeued && !G.requeued.has(qkey)) { G.requeued.add(qkey); G.queue.push({...q}); }
+    showFB(false, q, false, 0, raw);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 50:50 for MC
+// ─────────────────────────────────────────────────────────────
+function useMCHint() {
+  if (G.answered || save.lives <= 0) return;
+  save.lives = Math.max(0, save.lives - 1);
+  persist();
+  renderLives();
+  // Fade two wrong options
+  const btns = document.querySelectorAll('.mc-btn');
+  const wrongs = [...btns].filter(b => b.querySelector('.mc-txt').textContent !== G.queue[G.qi].a);
+  shuffle([...wrongs]).slice(0, 2).forEach(b => {
+    b.classList.add('faded');
+    b.disabled = true;
+  });
+  // Update both hint buttons
+  const mcLives = document.getElementById('mcHintLives');
+  if (mcLives) mcLives.textContent = save.lives;
+  const mcTxt = document.getElementById('mcHintTxt');
+  if (mcTxt) mcTxt.style.color = save.lives <= 0 ? '#4a5a4a' : '#7a8a7a';
+  const mcBtn = document.getElementById('mcHintBtn');
+  if (mcBtn) mcBtn.style.pointerEvents = save.lives <= 0 ? 'none' : 'auto';
+  updateHintBtn();
+}
+
+// ─────────────────────────────────────────────────────────────
+// FEEDBACK
+// ─────────────────────────────────────────────────────────────
+function showFB(ok, q, exactFada, stars, userAnswer) {
+  ok ? ding() : dong();
+  const fb = document.getElementById('fb');
+  fb.className = 'fb show';
+  const res = document.getElementById('fbResult');
+  res.className = 'fb-result ' + (ok ? 'ok' : 'bad');
+  res.innerHTML = ok ? (exactFada ? '🌟 Togha! · <span style="font-weight:400;font-size:.8em">Perfect! Fada too!</span>' : '✓ Ceart! · <span style="font-weight:400;font-size:.8em">Correct!</span>') : '✗ Mícheart · <span style="font-weight:400;font-size:.8em">Wrong</span>';
+  if (ok) {
+    document.getElementById('fbAns').innerHTML = `<span style='color:#2a7a4a'>${q.a}</span>`;
+  } else if (userAnswer) {
+    document.getElementById('fbAns').innerHTML =
+      `<span style='color:var(--red);text-decoration:line-through;font-size:.78rem'>${userAnswer}</span><br>` +
+      `<span style='color:#4a6a4a;font-size:.72rem'>→ </span><span style='color:#1a2a1a'>${q.a}</span>`;
+  } else {
+    document.getElementById('fbAns').innerHTML = `<span style='color:#4a6a4a;font-size:.72rem'>Freagra · Answer: </span><span style='color:#1a2a1a'>${q.a}</span>`;
+  }
+  document.getElementById('fbPh').textContent = q.ph ? `/${q.ph}/` : '';
+  document.getElementById('fbStars').textContent = ok ? '★'.repeat(stars) : '';
+  document.getElementById('fbBonus').textContent = (ok && exactFada) ? 'FADA BONUS' : '';
+  // Collapse answer areas
+  document.getElementById('mcWrap').style.display = 'none';
+  document.getElementById('bridgeIrish').style.display = 'none';
+  document.getElementById('bridgePh').style.display = 'none';
+  document.getElementById('typedWrap').style.display = 'none';
+  document.getElementById('btnNext').style.display = 'block';
+}
+
+function showFBTimeout(q) {
+  const fb = document.getElementById('fb');
+  fb.className = 'fb show';
+  const res = document.getElementById('fbResult');
+  res.className = 'fb-result bad';
+  res.innerHTML = '⏱ Róthapa! · <span style="font-weight:400;font-size:.8em">Too slow!</span>';
+  document.getElementById('fbAns').innerHTML = `<span style='color:#4a6a4a;font-size:.72rem'>Freagra · Answer: </span><span style='color:#1a2a1a'>${q.a}</span>`;
+  document.getElementById('fbPh').textContent = q.ph ? `/${q.ph}/` : '';
+  document.getElementById('fbStars').textContent = '';
+  document.getElementById('fbBonus').textContent = '';
+  document.getElementById('mcWrap').style.display = 'none';
+  document.getElementById('mcHintBtn').style.display = 'none';
+  document.getElementById('bridgeIrish').style.display = 'none';
+  document.getElementById('bridgePh').style.display = 'none';
+  document.getElementById('typedWrap').style.display = 'none';
+  document.getElementById('btnNext').style.display = 'block';
+  const sb = document.getElementById('submitBtn');
+  if (sb) sb.style.display = 'none';
+}
+
+function nextQ() {
+  G.qi++;
+  if (G.qi >= G.queue.length) {
+    endLoop();
+  } else {
+    renderQ();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// END LOOP
+// ─────────────────────────────────────────────────────────────
+function endLoop() {
+  clearInterval(G.timer);
+  const loop = G.level.loops[G.loopIdx];
+  const baseQs = 20;
+  const correct = G.score;
+  const perfect = correct === baseQs;
+  const passed = correct >= 14; // 14/20 = 70%
+
+  // Save progress — only advance loopsDone if passed
+  const lvSave = save.levels[G.level.id] || {};
+  if (passed && (lvSave.loopsDone || 0) <= G.loopIdx) {
+    lvSave.loopsDone = G.loopIdx + 1;
+  }
+  if (perfect) {
+    save.lives = Math.min(5, save.lives + 1);
+    renderLives();
+  }
+  save.levels[G.level.id] = lvSave;
+  persist();
+
+  // Check if level complete — only if passed this loop
+  const levelComplete = passed && (lvSave.loopsDone || 0) >= G.level.loops.length;
+
+  const icon = perfect ? '🌟' : passed ? '✅' : '🔄';
+  const title = perfect ? 'Foirfe! · Perfect!' : passed ? 'Ar aghaidh! · Next!' : 'Arís · Try again';
+  const msgs = {
+    perfect: 'Gach ceist ceart · Every answer right.',
+    passed: 'Lúb críochnaithe · Loop complete. Ar aghaidh · Keep going.',
+    failed: 'Ná bí buartha · Don\'t worry. Arís eile · Once more.',
+  };
+  const msg = perfect ? msgs.perfect : passed ? msgs.passed : msgs.failed;
+
+  document.getElementById('loopIcon').textContent = icon;
+  document.getElementById('loopTitle').textContent = title;
+  // Stars: show what was earned with clear label
+  let starStr;
+  if (perfect) starStr = '★★★';
+  else if (correct >= 18) starStr = '★★';
+  else if (correct >= 14) starStr = '★';
+  else starStr = '—';
+  document.getElementById('loopStars').textContent = starStr;
+  document.getElementById('loopScore').textContent = `${correct} / 20 ceart · correct`;
+  document.getElementById('loopMsg').textContent = msg;
+  // Breakdown: why did I fail/pass?
+  const breakdown = [];
+  if (G.wrongs > 0) breakdown.push(`${G.wrongs} mícheart · wrong`);
+  if (G.timeouts > 0) breakdown.push(`${G.timeouts} am caite · timed out`);
+  const breakEl = document.getElementById('loopLife');
+  if (perfect) {
+    breakEl.textContent = '💚 Saol gnóthaithe · Life earned!';
+  } else if (passed) {
+    breakEl.textContent = breakdown.length ? breakdown.join(' · ') : '';
+  } else {
+    breakEl.innerHTML = (breakdown.length ? breakdown.join(' &nbsp;·&nbsp; ') + '<br>' : '') + '💔 Triail arís · Try again';
+  }
+
+  const btns = document.getElementById('loopBtns');
+  btns.innerHTML = '';
+
+  if (levelComplete) {
+    const b = document.createElement('button');
+    b.className = 'btn-p';
+    b.innerHTML = `${G.level.badge} An Suaitheantas →<span style='display:block;font-size:.7rem;opacity:.7;font-weight:400'>Claim your badge</span>`;
+    b.onclick = () => showBadge();
+    btns.appendChild(b);
+  } else if (passed) {
+    const nextLoop = G.level.loops[G.loopIdx + 1];
+    const b = document.createElement('button');
+    b.className = 'btn-p';
+    const nextName = nextLoop ? nextLoop.name : '';
+    b.innerHTML = nextLoop
+      ? `Lúb ${G.loopIdx + 2}: ${nextLoop.name} →<span style='display:block;font-size:.7rem;opacity:.7;font-weight:400'>Loop ${G.loopIdx + 2}: ${nextLoop.desc || nextLoop.name}</span>`
+      : `Ar aghaidh →<span style='display:block;font-size:.7rem;opacity:.7;font-weight:400'>Continue</span>`;
+    b.onclick = () => startLoop(G.loopIdx + 1);
+    btns.appendChild(b);
+  }
+
+  const replay = document.createElement('button');
+  replay.className = 'btn-s';
+  replay.innerHTML = passed ? '↺ Arís · Again' : '↺ Triail arís · Try again';
+  replay.onclick = () => startLoop(G.loopIdx);
+  btns.appendChild(replay);
+
+  const home = document.createElement('button');
+  home.className = 'btn-s';
+  home.textContent = '← Abhaile · Home';
+  home.onclick = () => goHome();
+  btns.appendChild(home);
+
+  show('loopScreen');
+}
+
+// ─────────────────────────────────────────────────────────────
+// BADGE
+// ─────────────────────────────────────────────────────────────
+function showBadge() {
+  setTimeout(chime, 300);
+  const lv = G.level;
+  const lvSave = save.levels[lv.id] || {};
+  lvSave.badge = true;
+  save.levels[lv.id] = lvSave;
+  persist();
+  buildHome();
+
+  document.getElementById('badgeBig').textContent = lv.badge;
+  const mt = document.getElementById('moonTransition');
+  if (mt) mt.textContent = '🌑 → ' + lv.badge;
+  buildHome();
+  document.getElementById('badgeLevel').textContent = lv.id + ' · ' + lv.name;
+  document.getElementById('badgeName').textContent = '— ' + lv.name + ' —';
+  document.getElementById('badgeIrish').textContent = lv.badgeIrish || '';
+  document.getElementById('badgeIrishEn').textContent = (lv.badgeIrishEn || '') + (lv.badgeIrishEn ? '' : '');
+  document.getElementById('badgeIrishEn').textContent = lv.badgeIrishEn || '';
+
+  const nextLv = LEVELS[LEVELS.indexOf(lv) + 1];
+  document.getElementById('badgeNext').textContent = nextLv
+    ? `${nextLv.badge} ${nextLv.id} · ${nextLv.name} díghlasáilte · unlocked`
+    : '🏆 Tá tú ag barr · You have reached the top!';
+
+  const continueBtn = document.getElementById('badgeContinueBtn');
+  if (nextLv) {
+    continueBtn.innerHTML = `Lean ar aghaidh · Continue → ${nextLv.id}<span style='display:block;font-size:.72rem;opacity:.7;font-weight:400'>${nextLv.name}</span>`;
+    continueBtn.onclick = () => openLevel(nextLv.id);
+  } else {
+    continueBtn.textContent = '🏆 Abhaile · Home';
+    continueBtn.onclick = () => goHome();
+  }
+
+  show('badgeScreen');
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────
+function goHome() {
+  clearInterval(G.timer);
+  buildHome();
+  show('homeScreen');
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffle(a) {
+  for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function normalise(s) {
+  return s.toLowerCase()
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u')
+    .replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim();
+}
+
+function fuzzy(a, b) {
+  if (Math.abs(a.length-b.length) > 3) return false;
+  let d=0;
+  for(let i=0;i<Math.max(a.length,b.length);i++) if(a[i]!==b[i]&&++d>2) return false;
+  return true;
+}
+
+document.getElementById('typedInput').addEventListener('keydown', e => { if(e.key==='Enter') submitTyped(); });
+
+init();
+</script>
+  <div style="width:100%;text-align:center;padding:6px 0;font-size:.6rem;color:#3a5a3a;background:var(--deep);flex-shrink:0;border-top:1px solid var(--border);">
+    © 2026 Turbo Games · <em>Samhlaíocht agus Diongbháilteacht · Imagination and Perseverance</em>
+  </div>
+</body>
+</html>
